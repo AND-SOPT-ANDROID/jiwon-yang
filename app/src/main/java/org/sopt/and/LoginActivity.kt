@@ -16,10 +16,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,6 +85,10 @@ fun Greeting2(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth(),
             placeholder = {Text("이메일 주소 또는 아이디") },
             singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Gray,
+                unfocusedTextColor = Color.DarkGray
+            ),
         )
         Spacer(modifier = Modifier.weight(0.025f))
         TextField(
@@ -89,16 +97,27 @@ fun Greeting2(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth(),
             placeholder = {Text("비밀번호") },
             singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Gray,
+                unfocusedTextColor = Color.DarkGray
+            ),
         )
         Spacer(modifier = Modifier.weight(0.2f))
+        var intent = Intent(context, MyActivity::class.java)
         Button(
             onClick = {
+                Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
+                intent.apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                    context.startActivity(this)
+                }
 
             },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Blue
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.Blue),
-
         ) {
             Text(
                 "로그인",
@@ -113,7 +132,7 @@ fun Greeting2(modifier: Modifier = Modifier) {
 
         ){
             Text(
-                "1번 텍스트",
+                "아이디 찾기",
                 color = Color.Gray,
                 fontSize = 13.sp
             )
@@ -123,7 +142,7 @@ fun Greeting2(modifier: Modifier = Modifier) {
                 fontSize = 13.sp
             )
             Text(
-                "1번 텍스트",
+                "비밀번호 재설정",
                 color = Color.Gray,
                 fontSize = 13.sp
             )
@@ -133,7 +152,7 @@ fun Greeting2(modifier: Modifier = Modifier) {
                 fontSize = 13.sp
             )
             Text(
-                "1번 텍스트",
+                "회원가입",
                 color = Color.Gray,
                 fontSize = 13.sp
             )
@@ -145,7 +164,21 @@ fun Greeting2(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             color = Color.Gray
         )
-        /*아이콘 배치하기*/
+        Spacer(modifier = Modifier.weight(0.1f))
+        Row (
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+        ){
+            Spacer(modifier = Modifier.width(10.dp))
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Spacer(modifier = Modifier.width(10.dp))
+
+        }
         Spacer(modifier = Modifier.weight(0.5f))
         Text(
             "* SNS계정으로 간편하게 가입하여 서비스를 이용하실 수 있습니다.\n " +

@@ -75,6 +75,8 @@ fun Greeting3(modifier: Modifier = Modifier) {
                     .fillMaxWidth()
                     .padding(25.dp)
             ) {
+                Text("사진")
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     "프로필 1님",
                     color = Color.White

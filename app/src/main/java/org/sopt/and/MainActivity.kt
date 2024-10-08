@@ -3,22 +3,28 @@ package org.sopt.and
 import android.R
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
+import android.util.Patterns
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,10 +53,36 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+fun EmailValidCheck(email: String): Boolean {
+    var isValid = false
+    //val expression = "^[\\w.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"
+    val inputStr : CharSequence = email
+    val pattern = Patterns.EMAIL_ADDRESS
+    val matcher = pattern.matcher(inputStr)
+    if(matcher.matches()){
+        isValid = true
+    }
+    return isValid
+}
+
+fun PasswordValidCheck(password: String): Boolean {
+    var isValid = false
+    val expression = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,20}$" // 영문, 숫자, 특수문자
+    val inputStr : CharSequence = password
+    //val matcher = expression.matcher(intputStr)
+    return isValid
+}
+
 @Composable
 fun Greeting(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
+    
+    //이메일, 비밀번호 유효 여부에 따른 회원가입 가능여부 flag
+    var email_flag = 0;
+    var password_flag = 0; //8~20자 이내 조건 확인
+    var password_flag2 = 0; //영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용 여부 확인
+
 
     Column(
         modifier = Modifier
@@ -59,7 +91,7 @@ fun Greeting(modifier: Modifier = Modifier) {
             .padding(25.dp),
         //horizontalAlignment = Alignment.CenterHorizontally
     ){
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             "회원가입",
             modifier = Modifier.fillMaxWidth(),
@@ -68,7 +100,7 @@ fun Greeting(modifier: Modifier = Modifier) {
             color = Color.White
 
         )
-        Spacer(modifier = Modifier.weight(0.1f))
+        Spacer(modifier = Modifier.weight(0.35f))
 
         Text(
             "이메일과 비밀번호만으로\nWavve를 즐길 수 있어요!",
@@ -84,7 +116,10 @@ fun Greeting(modifier: Modifier = Modifier) {
             value = EmailText.value,
             onValueChange = { EmailText.value = it },
             modifier = Modifier.fillMaxWidth(),
-            //colors =
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Gray,
+                unfocusedTextColor = Color.DarkGray
+            ),
             placeholder = { Text("wavve@example.com") },
             singleLine = true,
 
@@ -102,6 +137,10 @@ fun Greeting(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth(),
             placeholder = {Text("Wavve 비밀번호 설정") },
             singleLine = true,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Gray,
+                unfocusedTextColor = Color.DarkGray
+            ),
         )
         Spacer(modifier = Modifier.weight(0.025f))
         Text(
@@ -117,7 +156,21 @@ fun Greeting(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             color = Color.Gray
         )
-        /*아이콘 배치하기*/
+        Spacer(modifier = Modifier.weight(0.1f))
+        Row (
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+        ){
+            Spacer(modifier = Modifier.width(10.dp))
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Text("아이콘", color = Color.Gray)
+            Spacer(modifier = Modifier.width(10.dp))
+
+        }
         Spacer(modifier = Modifier.weight(0.5f))
         Text(
             "* SNS계정으로 간편하게 가입하여 서비스를 이용하실 수 있습니다. 기존 POOQ 계정 또는 Wavve 계정과는 연동되지 않으니 이용에 참고하세요.",
@@ -134,6 +187,22 @@ fun Greeting(modifier: Modifier = Modifier) {
                 .background(Color.DarkGray)
                 .padding(vertical = 13.dp)
                 .clickable{
+
+                    //이메일 형식 조건 검사
+                    if(!EmailValidCheck(EmailText.value)){
+                        email_flag = 1;
+                    }
+
+                    if(PasswordText.value.length < 8 || PasswordText.value.length > 20){
+                        password_flag = 1;
+                    }
+
+                    //비밀번호 형식 조건 검사
+                    if(PasswordText.value.length <= 6){
+                        password_flag2 = 1;
+                    }
+
+
                     Toast.makeText(context, "로그인 되었습니다", Toast.LENGTH_SHORT).show()
                     intent.apply {
                         flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK

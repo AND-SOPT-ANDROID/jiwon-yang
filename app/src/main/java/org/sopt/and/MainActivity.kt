@@ -31,10 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class MainActivity : ComponentActivity() {
@@ -66,11 +69,9 @@ fun EmailValidCheck(email: String): Boolean {
 }
 
 fun PasswordValidCheck(password: String): Boolean {
-    var isValid = false
-    val expression = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&.])[A-Za-z[0-9]$@$!%*#?&.]{8,20}$" // 영문, 숫자, 특수문자
-    val inputStr : CharSequence = password
-    //val matcher = expression.matcher(intputStr)
-    return isValid
+    val pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*])|(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*])|(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\$%^&*]).{8,20}\$".toRegex()
+    return password.matches(pattern)
+
 }
 
 @Composable
@@ -81,7 +82,10 @@ fun Greeting(modifier: Modifier = Modifier) {
     //이메일, 비밀번호 유효 여부에 따른 회원가입 가능여부 flag
     var email_flag = 0;
     var password_flag = 0; //8~20자 이내 조건 확인
-    var password_flag2 = 0; //영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용 여부 확인
+    var toastMessage = "";
+
+    var shouldShowPassword = remember {mutableStateOf(false)}
+    var shouldDisplayShow = remember {mutableStateOf(true)} //0이면 show 보이기, 1이면 hide 보이기
 
 
     Column(
@@ -110,6 +114,9 @@ fun Greeting(modifier: Modifier = Modifier) {
 
         var EmailText = remember { mutableStateOf("") }
         var PasswordText = remember { mutableStateOf("") }
+        var PasswordFieldButtonMessage = ""
+
+
 
         Spacer(modifier = Modifier.weight(0.25f))
         TextField(
@@ -135,12 +142,32 @@ fun Greeting(modifier: Modifier = Modifier) {
             value = PasswordText.value,
             onValueChange = { PasswordText.value = it },
             modifier = Modifier.fillMaxWidth(),
-            placeholder = {Text("Wavve 비밀번호 설정") },
             singleLine = true,
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Gray,
                 unfocusedTextColor = Color.DarkGray
             ),
+            trailingIcon = {
+                if(shouldDisplayShow.value == true){
+                    PasswordFieldButtonMessage = "show"
+                }else{
+                    PasswordFieldButtonMessage = "hide"
+                }
+                Text(
+                    text = PasswordFieldButtonMessage,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable{
+                        shouldShowPassword.value = !shouldShowPassword.value
+                        shouldDisplayShow.value = !shouldDisplayShow.value
+                    }
+                )
+            },
+            placeholder = { Text("Wavve 비밀번호 설정") },
+            visualTransformation = if(shouldShowPassword.value){
+                VisualTransformation.None
+            }else{
+                PasswordVisualTransformation()
+            }
         )
         Spacer(modifier = Modifier.weight(0.025f))
         Text(
@@ -191,23 +218,26 @@ fun Greeting(modifier: Modifier = Modifier) {
                     //이메일 형식 조건 검사
                     if(!EmailValidCheck(EmailText.value)){
                         email_flag = 1;
-                    }
+                        toastMessage = "형식에 맞는 이메일을 입력하세요"
 
-                    if(PasswordText.value.length < 8 || PasswordText.value.length > 20){
-                        password_flag = 1;
                     }
 
                     //비밀번호 형식 조건 검사
-                    if(PasswordText.value.length <= 6){
-                        password_flag2 = 1;
+                    if(!PasswordValidCheck(PasswordText.value)){
+                        password_flag = 1;
+                        toastMessage = "조건에 맞는 비밀번호를 사용하세요"
                     }
 
-
-                    Toast.makeText(context, "로그인 되었습니다", Toast.LENGTH_SHORT).show()
-                    intent.apply {
-                        flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(this)
+                    if(email_flag == 0 && password_flag == 0){
+                        toastMessage = "로그인 되었습니다"
+                        intent.apply {
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(this)
+                        }
                     }
+
+                    Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+
                 },
             color = Color.White
         )

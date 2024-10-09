@@ -5,10 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Patterns
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,11 +42,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.core.content.ContextCompat.startActivity
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class MainActivity : ComponentActivity() {
+    //private lateinit var signInLauncher: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             ANDANDROIDTheme {
@@ -55,6 +63,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
 
 fun EmailValidCheck(email: String): Boolean {
     var isValid = false
@@ -206,6 +216,7 @@ fun Greeting(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.weight(1f))
         var intent = Intent(context, LoginActivity::class.java)
+
         Text(
             "Wavve 회원가입",
             textAlign = TextAlign.Center,
@@ -229,6 +240,11 @@ fun Greeting(modifier: Modifier = Modifier) {
                     }
 
                     if(email_flag == 0 && password_flag == 0){
+
+
+                        intent.putExtra("email", EmailText.value)
+                        intent.putExtra("password", PasswordText.value)
+
                         toastMessage = "로그인 되었습니다"
                         intent.apply {
                             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK

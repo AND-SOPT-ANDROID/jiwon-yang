@@ -2,10 +2,14 @@ package org.sopt.and
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,42 +25,85 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class LoginActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             ANDANDROIDTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                val scope = rememberCoroutineScope()
+                val snackbarHostState = remember { SnackbarHostState() }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
+                ) { innerPadding ->
+
                     Greeting2(
-                        modifier = Modifier.padding(innerPadding)
+                        modifier = Modifier.padding(innerPadding),
+                        scope = scope,
+                        snackbarHostState = snackbarHostState
                     )
+
                 }
             }
         }
     }
+
 }
 
 @Composable
-fun Greeting2(modifier: Modifier = Modifier) {
+fun Greeting2(modifier: Modifier = Modifier,
+              scope : CoroutineScope,
+              snackbarHostState: SnackbarHostState
+) {
 
     val context = LocalContext.current
+    val activity = context as? ComponentActivity
+
+    var mypageIntent = Intent(context, MyActivity::class.java)
+
+    var shouldShowPassword = remember {mutableStateOf(false)}
+    var shouldDisplayShow = remember {mutableStateOf(true)} //0이면 show 보이기, 1이면 hide 보이기
+
+
+
+
+    val deliveredEmail = activity?.intent?.getStringExtra("email") ?: ""
+    val deliveredPassword = activity?.intent?.getStringExtra("password") ?: ""
+
+    Log.d("LoginActivity", "Received Email: $deliveredEmail")
+    Log.d("LoginActivity", "Received Password: $deliveredPassword")
+
 
     Column(
         modifier = Modifier
@@ -78,6 +125,8 @@ fun Greeting2(modifier: Modifier = Modifier) {
 
         var EmailText = remember { mutableStateOf("") }
         var PasswordText = remember { mutableStateOf("") }
+        var PasswordFieldButtonMessage = ""
+
 
         TextField(
             value = EmailText.value,
@@ -101,16 +150,57 @@ fun Greeting2(modifier: Modifier = Modifier) {
                 focusedContainerColor = Color.Gray,
                 unfocusedTextColor = Color.DarkGray
             ),
+            trailingIcon = {
+                if(shouldDisplayShow.value == true){
+                    PasswordFieldButtonMessage = "show"
+                }else{
+                    PasswordFieldButtonMessage = "hide"
+                }
+                Text(
+                    text = PasswordFieldButtonMessage,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable{
+                        shouldShowPassword.value = !shouldShowPassword.value
+                        shouldDisplayShow.value = !shouldDisplayShow.value
+                    }
+                )
+            },
+            visualTransformation = if(shouldShowPassword.value){
+                VisualTransformation.None
+            }else{
+                PasswordVisualTransformation()
+            }
         )
         Spacer(modifier = Modifier.weight(0.2f))
-        var intent = Intent(context, MyActivity::class.java)
+
         Button(
             onClick = {
-                Toast.makeText(context, "로그인 성공", Toast.LENGTH_SHORT).show()
-                intent.apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                    context.startActivity(this)
+
+                var loginMessage = ""
+                var loginSuccessFlag = 0;
+
+
+                if(EmailText.value == deliveredEmail && PasswordText.value == deliveredPassword){
+                    loginMessage = "로그인 성공"
+                    loginSuccessFlag = 1;
+                } else {
+                    loginMessage = "알맞은 이메일과 비밀번호를 입력하세요"
                 }
+
+                scope.launch {
+                    val snackbarResult = snackbarHostState.showSnackbar(loginMessage)
+
+                    if(loginSuccessFlag == 1 && snackbarResult == SnackbarResult.Dismissed){
+                        mypageIntent.apply {
+                            putExtra("email", EmailText.value)
+                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(this)
+                        }
+                    }
+                }
+                //Toast.makeText(context, loginMessage, Toast.LENGTH_SHORT).show()
+
+
 
             },
             colors = ButtonDefaults.buttonColors(
@@ -196,6 +286,11 @@ fun Greeting2(modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview2() {
     ANDANDROIDTheme {
-        Greeting2()
+        val scope = rememberCoroutineScope()
+        val snackbarHostState = remember { SnackbarHostState() }
+        Greeting2(
+            scope = scope,
+            snackbarHostState = snackbarHostState
+        )
     }
 }

@@ -56,6 +56,9 @@ class MyActivity : ComponentActivity() {
 fun Greeting3(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
+    val activity = context as? ComponentActivity
+
+    val deliveredEmail = activity?.intent?.getStringExtra("email") ?: ""
 
     Column(
         modifier = Modifier
@@ -78,7 +81,7 @@ fun Greeting3(modifier: Modifier = Modifier) {
                 Text("사진")
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    "프로필 1님",
+                    "${deliveredEmail}님",
                     color = Color.White
                 )
                 Spacer(modifier = Modifier.weight(0.5f))

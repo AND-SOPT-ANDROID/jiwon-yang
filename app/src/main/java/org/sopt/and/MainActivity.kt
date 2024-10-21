@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.core.content.ContextCompat.startActivity
+import org.sopt.and.ui.components.SignUpTextField
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class MainActivity : ComponentActivity() {
@@ -55,7 +56,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ANDANDROIDTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
+                    SignUpScreen(
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
@@ -63,8 +64,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
 
 fun EmailValidCheck(email: String): Boolean {
     var isValid = false
@@ -85,18 +84,22 @@ fun PasswordValidCheck(password: String): Boolean {
 }
 
 @Composable
-fun Greeting(modifier: Modifier = Modifier) {
+fun SignUpScreen(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
-    
-    //이메일, 비밀번호 유효 여부에 따른 회원가입 가능여부 flag
-    var email_flag = 0;
-    var password_flag = 0; //8~20자 이내 조건 확인
-    var toastMessage = "";
+
+    var emailFlag = 0
+    var passwordFlag = 0 //8~20자 이내 조건 확인
+    var toastMessage = ""
+
+    var emailText = remember { mutableStateOf("") }
+    var passwordText = remember { mutableStateOf("") }
+    var PasswordFieldButtonMessage = ""
 
     var shouldShowPassword = remember {mutableStateOf(false)}
     var shouldDisplayShow = remember {mutableStateOf(true)} //0이면 show 보이기, 1이면 hide 보이기
-
+    var isEmailValid = remember { mutableStateOf(true) }
+    var isPasswordValid = remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -122,68 +125,38 @@ fun Greeting(modifier: Modifier = Modifier) {
             fontSize = 21.sp
         )
 
-        var EmailText = remember { mutableStateOf("") }
-        var PasswordText = remember { mutableStateOf("") }
-        var PasswordFieldButtonMessage = ""
-
-
-
         Spacer(modifier = Modifier.weight(0.25f))
-        TextField(
-            value = EmailText.value,
-            onValueChange = { EmailText.value = it },
-            modifier = Modifier.fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Gray,
-                unfocusedTextColor = Color.DarkGray
-            ),
-            placeholder = { Text("wavve@example.com") },
-            singleLine = true,
 
-        )
-        Spacer(modifier = Modifier.weight(0.025f))
-        Text(
-            "로그인, 비밀번호 찾기, 알림에 사용되니 정확한 이메일을 입력해주세요.",
-            color = Color.Gray,
-            fontSize = 13.sp
-        )
-        Spacer(modifier = Modifier.weight(0.15f))
-        TextField(
-            value = PasswordText.value,
-            onValueChange = { PasswordText.value = it },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Gray,
-                unfocusedTextColor = Color.DarkGray
-            ),
-            trailingIcon = {
-                if(shouldDisplayShow.value == true){
-                    PasswordFieldButtonMessage = "show"
-                }else{
-                    PasswordFieldButtonMessage = "hide"
-                }
-                Text(
-                    text = PasswordFieldButtonMessage,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable{
-                        shouldShowPassword.value = !shouldShowPassword.value
-                        shouldDisplayShow.value = !shouldDisplayShow.value
-                    }
-                )
+        SignUpTextField(
+            text = emailText.value,
+            onValueChange = { newValue ->
+                emailText.value = newValue
+                isEmailValid.value = EmailValidCheck(emailText.value)
             },
-            placeholder = { Text("Wavve 비밀번호 설정") },
-            visualTransformation = if(shouldShowPassword.value){
-                VisualTransformation.None
-            }else{
-                PasswordVisualTransformation()
-            }
+            fieldType = "Email",
+            conditionCheck = isEmailValid.value,
+            errMessage = "올바른 이메일 형식이 아닙니다.",
+            placeholder = "wavve@example.com",
+            descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확한 이메일을 입력해주세요.",
         )
-        Spacer(modifier = Modifier.weight(0.025f))
-        Text(
-            "비밀번호는 8~20자 이내로 영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용하여 입력해 주세요.",
-            color = Color.Gray,
-            fontSize = 13.sp
+
+        Spacer(modifier = Modifier.weight(0.15f))
+
+        SignUpTextField(
+            text = passwordText.value,
+            onValueChange = { newValue ->
+                passwordText.value = newValue
+                isPasswordValid.value = PasswordValidCheck(passwordText.value)
+            },
+            fieldType = "Password",
+            conditionCheck = isPasswordValid.value,
+            errMessage = "올바른 비밀번호 형식이 아닙니다.",
+            placeholder = "Wavve 비밀번호 설정",
+            shouldShowPassword = shouldShowPassword.value,
+            onPasswordVisibilityChange = {
+                shouldShowPassword.value = !shouldShowPassword.value
+            },
+            descriptionText = "비밀번호는 8~20자 이내로 영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용하여 입력해 주세요.",
         )
 
         Spacer(modifier = Modifier.weight(0.5f))
@@ -224,26 +197,26 @@ fun Greeting(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .background(Color.DarkGray)
                 .padding(vertical = 13.dp)
-                .clickable{
+                .clickable {
 
                     //이메일 형식 조건 검사
-                    if(!EmailValidCheck(EmailText.value)){
-                        email_flag = 1;
+                    if (!EmailValidCheck(emailText.value)) {
+                        emailFlag = 1
                         toastMessage = "형식에 맞는 이메일을 입력하세요"
 
                     }
 
                     //비밀번호 형식 조건 검사
-                    if(!PasswordValidCheck(PasswordText.value)){
-                        password_flag = 1;
+                    if (!PasswordValidCheck(passwordText.value)) {
+                        passwordFlag = 1
                         toastMessage = "조건에 맞는 비밀번호를 사용하세요"
                     }
 
-                    if(email_flag == 0 && password_flag == 0){
+                    if (emailFlag == 0 && passwordFlag == 0) {
 
 
-                        intent.putExtra("email", EmailText.value)
-                        intent.putExtra("password", PasswordText.value)
+                        intent.putExtra("email", emailText.value)
+                        intent.putExtra("password", passwordText.value)
 
                         toastMessage = "로그인 되었습니다"
                         intent.apply {
@@ -252,7 +225,9 @@ fun Greeting(modifier: Modifier = Modifier) {
                         }
                     }
 
-                    Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
+                    Toast
+                        .makeText(context, toastMessage, Toast.LENGTH_SHORT)
+                        .show()
 
                 },
             color = Color.White
@@ -269,8 +244,8 @@ fun Greeting(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun SignUpPreview() {
     ANDANDROIDTheme {
-        Greeting()
+        SignUpScreen()
     }
 }

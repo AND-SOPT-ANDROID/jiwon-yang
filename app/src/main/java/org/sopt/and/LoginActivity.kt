@@ -2,16 +2,11 @@ package org.sopt.and
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,35 +15,33 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.sopt.and.ui.components.SignUpTextField
+import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
+import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class LoginActivity : ComponentActivity() {
@@ -111,15 +104,17 @@ fun LoginScreen(modifier: Modifier = Modifier,
             .padding(25.dp),
     ){
         Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            "Wavve",
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp,
-            color = Color.White
-
-        )
-        Spacer(modifier = Modifier.weight(0.3f))
+            horizontalArrangement = Arrangement.Center
+        ){
+            Image(
+                painter = painterResource(id = R.drawable.wavve_logo),
+                contentDescription = "Wavve Logo",
+                modifier = Modifier
+                    .size(100.dp),
+            )
+        }
 
         SignUpTextField(
             text = emailText.value,
@@ -224,29 +219,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
             )
         }
         Spacer(modifier = Modifier.weight(0.2f))
-        Text(
-            "또는 다른 서비스 계정으로 가입",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            color = Color.Gray
-        )
-        Spacer(modifier = Modifier.weight(0.1f))
-        Row (
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier
-                .fillMaxWidth()
-        ){
-            Spacer(modifier = Modifier.width(10.dp))
-            repeat(5) { Text("아이콘", color = Color.Gray) } //kotlin에서의 반복문 활용법
-            Spacer(modifier = Modifier.width(10.dp))
-
-        }
-        Spacer(modifier = Modifier.weight(0.5f))
-        Text(
-            "* SNS계정으로 간편하게 가입하여 서비스를 이용하실 수 있습니다.\n기존 POOQ 계정 또는 Wavve 계정과는 연동되지 않으니 이용에 참고하세요.",
-            color = Color.Gray,
-            fontSize = 10.sp
-        )
+        SocialLoginSection(modifier = modifier)
         Spacer(modifier = Modifier.weight(1f))
 
     }

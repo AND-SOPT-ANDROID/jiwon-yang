@@ -105,7 +105,7 @@ fun SearchScreenPreview() {
                 innerPadding ->
             NavHost(
                 navController = navController,
-                startDestination = "home",
+                startDestination = "search",
                 modifier = Modifier.padding(innerPadding)
             ){
                 composable("home") {HomeScreen()}

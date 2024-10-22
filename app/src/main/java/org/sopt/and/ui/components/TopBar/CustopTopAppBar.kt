@@ -53,7 +53,6 @@ fun CustomTopAppBar(navController: NavController){
                 imageVector = Icons.Rounded.MailOutline,
                 contentDescription = "Live 방송"
             )
-
         }
     )
 }

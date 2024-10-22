@@ -77,7 +77,9 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import org.sopt.and.ui.components.BottomBar.CustomBottomAppBar
 import org.sopt.and.ui.components.BottomBar.NavIcon
+import org.sopt.and.ui.components.HomeScreen.HomeLazyRow
 import org.sopt.and.ui.components.TopBar.CustomTopAppBar
+import org.sopt.and.ui.components.TopBar.CustomTopAppBarSecond
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class HomeActivity : ComponentActivity() {
@@ -87,12 +89,14 @@ class HomeActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-
             ANDANDROIDTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        CustomTopAppBar(navController = navController)
+                        Column {
+                            CustomTopAppBar(navController = navController)
+                            CustomTopAppBarSecond(navController = navController)
+                        }
                     },
                     bottomBar = {
                         CustomBottomAppBar(navController = navController)
@@ -104,7 +108,6 @@ class HomeActivity : ComponentActivity() {
                             .background(Color(0xFF1B1B1B))
                             .padding(innerPadding)
                     ){
-                        CustomTopAppBarSecond(navController = navController)
 
                         NavHost(
                             navController = navController,
@@ -112,7 +115,7 @@ class HomeActivity : ComponentActivity() {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             composable("home") { HomeScreen() }
-                            composable("search") { MypageScreen() }
+                            composable("search") { SearchScreen() }
                             composable("profile") { MypageScreen() }
                         }
 
@@ -122,30 +125,6 @@ class HomeActivity : ComponentActivity() {
             }
         }
     }
-}
-
-@Composable
-fun CustomTopAppBarSecond(navController: NavController){
-    TopAppBar(
-        title = { },
-        colors = topAppBarColors(
-            containerColor = Color(0xFF1B1B1B),
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        actions = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ){
-                Text("뉴클래식", color = Color.LightGray)
-                Text("드라마", color = Color.LightGray)
-                Text("예능", color = Color.LightGray)
-                Text("영화", color = Color.LightGray)
-                Text("애니", color = Color.LightGray)
-                Text("해외시리즈", color = Color.LightGray)
-            }
-        }
-    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -188,46 +167,47 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 contentDescription = "imagePager",
                 contentScale = ContentScale.Crop
             )
-//            AsyncImage(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(16.dp)
-//                    .clip(RoundedCornerShape(16.dp)),
-//                model = ImageRequest.Builder(LocalContext.current).data(images[idx])
-//                    .build(),
-//                contentDescription = "imagePager",
-//                contentScale = ContentScale.Crop
-//            )
         }
 
-        Text("믿고 보는 웨이브 에디터 추천작", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
-        LazyRow (
-            modifier = Modifier
-                .padding(vertical = 16.dp)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(start = 8.dp, end = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            items(images){ imageRes ->
-                Image(
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(RoundedCornerShape(8.dp)),
-                    painter = painterResource(id = imageRes),
-                    contentDescription = "LazyRow Image",
-                    contentScale = ContentScale.Crop
-                )
-            }
+        HomeLazyRow(
+            title = "믿고 보는 웨이브 에디터 추천작",
+            images = images,
+            height = 230,
+            width = 140,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
 
-        }
+        HomeLazyRow(
+            title = "실시간 인기 콘텐츠",
+            images = images,
+            height = 230,
+            width = 140,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Text("실시간 인기 콘텐츠", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        HomeLazyRow(
+            title = "오직 웨이브에서",
+            images = images,
+            height = 230,
+            width = 140,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Text("오직 웨이브에서", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        HomeLazyRow(
+            title = "오늘의 TOP 20",
+            images = images,
+            height = 260,
+            width = 180,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
 
-        Text("오늘의 TOP 20", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
-
-        Text("당한 대로 갚아줄게", fontSize = 15.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        HomeLazyRow(
+            title = "당한 대로 갚아줄게",
+            images = images,
+            height = 230,
+            width = 140,
+        )
+        Spacer(modifier = Modifier.height(10.dp))
 
     }
 
@@ -242,7 +222,12 @@ fun HomeScreenPreview() {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
-                CustomTopAppBar(navController = navController)
+                Column{
+                    CustomTopAppBar(navController = navController)
+                    CustomTopAppBarSecond(navController = navController)
+
+                }
+
             },
             bottomBar = {
                 CustomBottomAppBar(navController = navController)
@@ -255,13 +240,12 @@ fun HomeScreenPreview() {
                     .background(Color(0xFF1B1B1B))
                     .padding(innerPadding)
             ){
-                CustomTopAppBarSecond(navController = navController)
                 NavHost(
                     navController = navController,
                     startDestination = "home",
                 ){
                     composable("home") {HomeScreen()}
-                    composable("search") {MypageScreen()}
+                    composable("search") {SearchScreen()}
                     composable("profile") {MypageScreen()}
                 }
             }

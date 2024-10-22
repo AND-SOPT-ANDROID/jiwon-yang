@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,10 +21,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -37,9 +42,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +59,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import org.sopt.and.ui.components.BottomBar.CustomBottomAppBar
 import org.sopt.and.ui.components.BottomBar.NavIcon
+import org.sopt.and.ui.components.MypageScreen.MyPageProfileSection
+import org.sopt.and.ui.components.MypageScreen.MyPageProfileSection2
+import org.sopt.and.ui.components.MypageScreen.MyPageSubSection
+import org.sopt.and.ui.components.TopBar.CustomTopAppBar
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class MyActivity : ComponentActivity() {
@@ -70,11 +82,11 @@ class MyActivity : ComponentActivity() {
                     innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = "home",
+                        startDestination = "profile",
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        composable("home") { MypageScreen() }
-                        composable("search") { MypageScreen() }
+                        composable("home") { HomeScreen() }
+                        composable("search") { SearchScreen() }
                         composable("profile") { MypageScreen() }
                     }
                 }
@@ -96,140 +108,43 @@ fun MypageScreen(modifier: Modifier = Modifier) {
             .fillMaxSize()
             .background(Color(0xFF1B1B1B))
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .padding(vertical = 30.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(25.dp)
-            ) {
-                Text("사진")
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    "${deliveredEmail}님",
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.weight(0.5f))
-                Text(
-                    "아이콘",
-                    color = Color.White
-                )
-                Text(
-                    "아이콘",
-                    color = Color.White
-                )
-            }
-
-
-        }
+        MyPageProfileSection(
+            deliveredEmail = deliveredEmail
+        )
         Spacer(modifier = Modifier.height(0.5.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .padding(vertical = 1.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(25.dp)
-            ) {
-                Text(
-                    "첫 결제 시 첫 달 100원!",
-                    color = Color.Gray
-                )
-                Text(
-                    "구매하기 >",
-                    color = Color.White
-                )
-            }
-        }
+        MyPageProfileSection2(
+            sectionDescription = "첫 결제 시 첫 달 100원!",
+            connectedUrl = ""
+        )
+        MyPageProfileSection2(
+            sectionDescription = "현재 보유하신 이용권이 없습니다.",
+            connectedUrl = ""
+        )
         Spacer(modifier = Modifier.height(0.5.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .padding(vertical = 1.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(25.dp)
-            ) {
-                Text(
-                    "현재 보유하신 이용권이 없습니다.",
-                    color = Color.Gray
-                )
-                Text(
-                    "구매하기 >",
-                    color = Color.White
-                )
-            }
-        }
 
-        Column (
+
+        MyPageSubSection(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
-        ){
-            Text(
-                "전체 시청내역",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
-            )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ){
-                Text(
-                    "아이콘",
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .padding(30.dp),
-                )
-                Text(
-                    "시청내역이 없어요.",
-                    color = Color.Gray,
-                )
-            }
-        }
+                .padding(20.dp),
+            title = "전체 시청내역",
+            topic = "시청내역",
+            contentNumber = 0,  /* 임시로 0개 고정함 */
+        )
+
         Spacer(
             modifier = Modifier.weight(0.2f)
         )
-        Column (
+
+        MyPageSubSection(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
-        ){
-            Text(
-                "관심 프로그램",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
-            )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ){
-                Text(
-                    "아이콘",
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .padding(30.dp),
-                )
-                Text(
-                    "관심 프로그램이 없어요.",
-                    color = Color.Gray,
-                )
-            }
-        }
+                .padding(20.dp),
+            title = "관심 프로그램",
+            topic = "관심 프로그램",
+            contentNumber = 0,  /* 임시로 0개 고정함 */
+        )
+
 
         Spacer(modifier = Modifier.weight(1f))
     }
@@ -254,8 +169,8 @@ fun MypagePreview3() {
                 startDestination = "home",
                 modifier = Modifier.padding(innerPadding)
             ){
-                composable("home") {MypageScreen()}
-                composable("search") {MypageScreen()}
+                composable("home") {HomeScreen()}
+                composable("search") {SearchScreen()}
                 composable("profile") {MypageScreen()}
             }
         }

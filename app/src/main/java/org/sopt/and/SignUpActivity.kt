@@ -40,7 +40,6 @@ data object SignUpScreen
 
 fun EmailValidCheck(email: String): Boolean {
     var isValid = false
-    //val expression = "^[\\w.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"
     val inputStr : CharSequence = email
     val pattern = Patterns.EMAIL_ADDRESS
     val matcher = pattern.matcher(inputStr)
@@ -70,10 +69,8 @@ fun SignUpScreen(
 
     var emailText = remember { mutableStateOf("") }
     var passwordText = remember { mutableStateOf("") }
-    var PasswordFieldButtonMessage = ""
 
     var shouldShowPassword = remember {mutableStateOf(false)}
-    var shouldDisplayShow = remember {mutableStateOf(true)} //0이면 show 보이기, 1이면 hide 보이기
     var isEmailValid = remember { mutableStateOf(true) }
     var isPasswordValid = remember { mutableStateOf(true) }
 
@@ -82,7 +79,6 @@ fun SignUpScreen(
             .fillMaxSize()
             .background(Color(0xFF1B1B1B))
             .padding(25.dp),
-        //horizontalAlignment = Alignment.CenterHorizontally
     ){
         Spacer(modifier = Modifier.height(20.dp))
         Text(
@@ -139,8 +135,6 @@ fun SignUpScreen(
         SocialLoginSection(modifier = modifier)
         Spacer(modifier = Modifier.weight(1f))
 
-        //var intent = Intent(context, LoginActivity::class.java)
-
         Text(
             "Wavve 회원가입",
             textAlign = TextAlign.Center,
@@ -164,12 +158,6 @@ fun SignUpScreen(
                     }
 
                     if (emailFlag == 0 && passwordFlag == 0) {
-//                        intent.putExtra("email", emailText.value)
-//                        intent.putExtra("password", passwordText.value)
-//                        intent.apply {
-//                            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-//                            context.startActivity(this)
-//                        }
 
                         toastMessage = "로그인 되었습니다"
 

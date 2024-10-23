@@ -2,11 +2,13 @@ package org.sopt.and
 
 import android.content.Intent
 import android.graphics.Paint
+import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,8 +19,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -27,190 +42,114 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import kotlinx.serialization.Serializable
+import org.sopt.and.ui.components.BottomBar.CustomBottomAppBar
+import org.sopt.and.ui.components.BottomBar.NavIcon
+import org.sopt.and.ui.components.MypageScreen.MyPageProfileSection
+import org.sopt.and.ui.components.MypageScreen.MyPageProfileSection2
+import org.sopt.and.ui.components.MypageScreen.MyPageSubSection
+import org.sopt.and.ui.components.TopBar.CustomTopAppBar
 import org.sopt.and.ui.theme.ANDANDROIDTheme
+import androidx.compose.runtime.livedata.observeAsState
 
-class MyActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ANDANDROIDTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting3(
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
-fun Greeting3(modifier: Modifier = Modifier) {
+fun MypageScreen(
+    navController: NavController,
+    userViewModel: UserViewModel = viewModel()
+) {
 
     val context = LocalContext.current
-    val activity = context as? ComponentActivity
+    val emailText = userViewModel.email.observeAsState("").value
 
-    val deliveredEmail = activity?.intent?.getStringExtra("email") ?: ""
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1B1B1B))
-            //.padding(25.dp),
-        //horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Scaffold(
+        bottomBar = {
+            CustomBottomAppBar(navController = navController)
+        }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .padding(vertical = 30.dp)
+                .fillMaxSize()
+                .background(Color(0xFF1B1B1B))
+                .padding(innerPadding)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(25.dp)
-            ) {
-                Text("사진")
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    "${deliveredEmail}님",
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.weight(0.5f))
-                Text(
-                    "아이콘",
-                    color = Color.White
-                )
-                Text(
-                    "아이콘",
-                    color = Color.White
-                )
-            }
-
-
-        }
-        Spacer(modifier = Modifier.height(0.5.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .padding(vertical = 1.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(25.dp)
-            ) {
-                Text(
-                    "첫 결제 시 첫 달 100원!",
-                    color = Color.Gray
-                )
-                Text(
-                    "구매하기 >",
-                    color = Color.White
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(0.5.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.DarkGray)
-                .padding(vertical = 1.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(25.dp)
-            ) {
-                Text(
-                    "현재 보유하신 이용권이 없습니다.",
-                    color = Color.Gray
-                )
-                Text(
-                    "구매하기 >",
-                    color = Color.White
-                )
-            }
-        }
-
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ){
-            Text(
-                "전체 시청내역",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
+            MyPageProfileSection(
+                deliveredEmail = emailText
             )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ){
-                Text(
-                    "아이콘",
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .padding(30.dp),
-                )
-                Text(
-                    "시청내역이 없어요.",
-                    color = Color.Gray,
-                )
-            }
-        }
-        Spacer(
-            modifier = Modifier.weight(0.2f)
-        )
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
-        ){
-            Text(
-                "관심 프로그램",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White
+            Spacer(modifier = Modifier.height(0.5.dp))
+            MyPageProfileSection2(
+                sectionDescription = "첫 결제 시 첫 달 100원!",
+                connectedUrl = ""
             )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+            MyPageProfileSection2(
+                sectionDescription = "현재 보유하신 이용권이 없습니다.",
+                connectedUrl = ""
+            )
+            Spacer(modifier = Modifier.height(0.5.dp))
+
+            MyPageSubSection(
                 modifier = Modifier
                     .fillMaxWidth()
-            ){
-                Text(
-                    "아이콘",
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .padding(30.dp),
-                )
-                Text(
-                    "관심 프로그램이 없어요.",
-                    color = Color.Gray,
-                )
-            }
-        }
+                    .padding(20.dp),
+                title = "전체 시청내역",
+                topic = "시청내역",
+                contentNumber = 0,  /* 임시로 0개 고정함 */
+            )
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(
+                modifier = Modifier.weight(0.2f)
+            )
+
+            MyPageSubSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                title = "관심 프로그램",
+                topic = "관심 프로그램",
+                contentNumber = 0,  /* 임시로 0개 고정함 */
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+        }
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview3() {
+fun MyPagePreview() {
+    val navController = rememberNavController()
+
     ANDANDROIDTheme {
-        Greeting3()
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                CustomBottomAppBar(navController = navController)
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF1B1B1B))
+                    .padding(innerPadding)
+            ) {
+                MypageScreen(navController = navController)
+            }
+        }
     }
 }

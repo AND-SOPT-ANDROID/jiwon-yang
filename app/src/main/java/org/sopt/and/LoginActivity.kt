@@ -40,45 +40,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
-class LoginActivity : ComponentActivity() {
+//class LoginActivity : ComponentActivity() {
+//
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//
+//        enableEdgeToEdge()
+//        setContent {
+//            ANDANDROIDTheme {
+//                val scope = rememberCoroutineScope()
+//                val snackbarHostState = remember { SnackbarHostState() }
+//
+//                Scaffold(
+//                    modifier = Modifier.fillMaxSize(),
+//                    snackbarHost = {
+//                        SnackbarHost(hostState = snackbarHostState)
+//                    },
+//                ) { innerPadding ->
+//
+//                    LoginScreen(
+//                        modifier = Modifier.padding(innerPadding),
+//                        scope = scope,
+//                        snackbarHostState = snackbarHostState,
+//                        emailText = "",
+//                        passwordText = ""
+//                    )
+//
+//                }
+//            }
+//        }
+//    }
+//
+//}
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
-        setContent {
-            ANDANDROIDTheme {
-                val scope = rememberCoroutineScope()
-                val snackbarHostState = remember { SnackbarHostState() }
-
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState)
-                    },
-                ) { innerPadding ->
-
-                    LoginScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        scope = scope,
-                        snackbarHostState = snackbarHostState
-                    )
-
-                }
-            }
-        }
-    }
-
-}
+@Serializable
+data class LoginScreen(
+    val emailText: String,
+    val passwordText: String
+)
 
 @Composable
 fun LoginScreen(modifier: Modifier = Modifier,
               scope : CoroutineScope,
-              snackbarHostState: SnackbarHostState
+              snackbarHostState: SnackbarHostState,
+                emailText: String,
+                passwordText: String,
+
 ) {
 
     val context = LocalContext.current
@@ -234,7 +246,9 @@ fun LoginScreenPreview2() {
         val snackbarHostState = remember { SnackbarHostState() }
         LoginScreen(
             scope = scope,
-            snackbarHostState = snackbarHostState
+            snackbarHostState = snackbarHostState,
+            emailText = "",
+            passwordText = "",
         )
     }
 }

@@ -38,25 +38,6 @@ import org.sopt.and.ui.theme.ANDANDROIDTheme
 @Serializable
 data object SignUpScreen
 
-//class SignUpActivity : ComponentActivity() {
-//    //private lateinit var signInLauncher: ActivityResultLauncher<Intent>
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//
-//        enableEdgeToEdge()
-//        setContent {
-//            ANDANDROIDTheme {
-//                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    SignUpScreen(
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-//                }
-//            }
-//        }
-//    }
-//}
-
 fun EmailValidCheck(email: String): Boolean {
     var isValid = false
     //val expression = "^[\\w.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$"
@@ -194,6 +175,7 @@ fun SignUpScreen(
 
                         //전달해줄 인자를 이 안에 넣으면 되는 듯..
                         navigateToLoginScreen(emailText.value, passwordText.value)
+                        println("네비게이트는 지남...")
                     }
 
                     Toast

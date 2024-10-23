@@ -53,10 +53,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import kotlinx.serialization.Serializable
 import org.sopt.and.ui.components.BottomBar.CustomBottomAppBar
 import org.sopt.and.ui.components.BottomBar.NavIcon
 import org.sopt.and.ui.components.MypageScreen.MyPageProfileSection
@@ -64,96 +66,73 @@ import org.sopt.and.ui.components.MypageScreen.MyPageProfileSection2
 import org.sopt.and.ui.components.MypageScreen.MyPageSubSection
 import org.sopt.and.ui.components.TopBar.CustomTopAppBar
 import org.sopt.and.ui.theme.ANDANDROIDTheme
+import androidx.compose.runtime.livedata.observeAsState
 
-class MyActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            val navController = rememberNavController()
 
-            ANDANDROIDTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        CustomBottomAppBar(navController = navController)
-                    }
-                ) {
-                    innerPadding ->
-                    NavHost(
-                        navController = navController,
-                        startDestination = "profile",
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        composable("home") { HomeScreen() }
-                        composable("search") { SearchScreen() }
-                        composable("profile") { MypageScreen() }
-                    }
-                }
-            }
+@Composable
+fun MypageScreen(
+    navController: NavController,
+    userViewModel: UserViewModel = viewModel()
+) {
+
+    val context = LocalContext.current
+    val emailText = userViewModel.email.observeAsState("").value
+
+    Scaffold(
+        bottomBar = {
+            CustomBottomAppBar(navController = navController)
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF1B1B1B))
+                .padding(innerPadding)
+        ) {
+            MyPageProfileSection(
+                deliveredEmail = emailText
+            )
+            Spacer(modifier = Modifier.height(0.5.dp))
+            MyPageProfileSection2(
+                sectionDescription = "첫 결제 시 첫 달 100원!",
+                connectedUrl = ""
+            )
+            MyPageProfileSection2(
+                sectionDescription = "현재 보유하신 이용권이 없습니다.",
+                connectedUrl = ""
+            )
+            Spacer(modifier = Modifier.height(0.5.dp))
+
+            MyPageSubSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                title = "전체 시청내역",
+                topic = "시청내역",
+                contentNumber = 0,  /* 임시로 0개 고정함 */
+            )
+
+            Spacer(
+                modifier = Modifier.weight(0.2f)
+            )
+
+            MyPageSubSection(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                title = "관심 프로그램",
+                topic = "관심 프로그램",
+                contentNumber = 0,  /* 임시로 0개 고정함 */
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
 
-@Composable
-fun MypageScreen(modifier: Modifier = Modifier) {
-
-    val context = LocalContext.current
-    val activity = context as? ComponentActivity
-
-    val deliveredEmail = activity?.intent?.getStringExtra("email") ?: ""
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1B1B1B))
-    ) {
-        MyPageProfileSection(
-            deliveredEmail = deliveredEmail
-        )
-        Spacer(modifier = Modifier.height(0.5.dp))
-        MyPageProfileSection2(
-            sectionDescription = "첫 결제 시 첫 달 100원!",
-            connectedUrl = ""
-        )
-        MyPageProfileSection2(
-            sectionDescription = "현재 보유하신 이용권이 없습니다.",
-            connectedUrl = ""
-        )
-        Spacer(modifier = Modifier.height(0.5.dp))
-
-
-        MyPageSubSection(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            title = "전체 시청내역",
-            topic = "시청내역",
-            contentNumber = 0,  /* 임시로 0개 고정함 */
-        )
-
-        Spacer(
-            modifier = Modifier.weight(0.2f)
-        )
-
-        MyPageSubSection(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            title = "관심 프로그램",
-            topic = "관심 프로그램",
-            contentNumber = 0,  /* 임시로 0개 고정함 */
-        )
-
-
-        Spacer(modifier = Modifier.weight(1f))
-    }
-
-}
-
 @Preview(showBackground = true)
 @Composable
-fun MypagePreview3() {
+fun MyPagePreview() {
     val navController = rememberNavController()
 
     ANDANDROIDTheme {
@@ -162,16 +141,14 @@ fun MypagePreview3() {
             bottomBar = {
                 CustomBottomAppBar(navController = navController)
             }
-        ) {
-            innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = "home",
-                modifier = Modifier.padding(innerPadding)
-            ){
-                composable("home") {HomeScreen()}
-                composable("search") {SearchScreen()}
-                composable("profile") {MypageScreen()}
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFF1B1B1B))
+                    .padding(innerPadding)
+            ) {
+                MypageScreen(navController = navController)
             }
         }
     }

@@ -75,6 +75,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import kotlinx.serialization.Serializable
 import org.sopt.and.ui.components.BottomBar.CustomBottomAppBar
 import org.sopt.and.ui.components.BottomBar.NavIcon
 import org.sopt.and.ui.components.HomeScreen.HomeLazyRow
@@ -82,136 +83,109 @@ import org.sopt.and.ui.components.TopBar.CustomTopAppBar
 import org.sopt.and.ui.components.TopBar.CustomTopAppBarSecond
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
-class HomeActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            val navController = rememberNavController()
-
-            ANDANDROIDTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = {
-                        Column {
-                            CustomTopAppBar(navController = navController)
-                            CustomTopAppBarSecond(navController = navController)
-                        }
-                    },
-                    bottomBar = {
-                        CustomBottomAppBar(navController = navController)
-                    }
-                ) { innerPadding ->
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xFF1B1B1B))
-                            .padding(innerPadding)
-                    ){
-
-                        NavHost(
-                            navController = navController,
-                            startDestination = "home",
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            composable("home") { HomeScreen() }
-                            composable("search") { SearchScreen() }
-                            composable("profile") { MypageScreen() }
-                        }
-
-                    }
-
-                }
-            }
-        }
-    }
-}
+@Serializable
+data object HomeScreen
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController, // navController를 넘겨 받아 사용
+) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .background(Color(0xFF1B1B1B))
-            .padding(all = 10.dp)
-    ){
-
-        val images = listOf(
-            R.drawable.food_pic1,
-            R.drawable.food_pic2,
-            R.drawable.food_pic3,
-            R.drawable.food_pic4,
-            R.drawable.food_pic5
-        )
-
-        val pagerState = rememberPagerState {images.size}
-
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp)
-        ) { idx ->
-            Image(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                painter = painterResource(id = images[idx]),
-                contentDescription = "imagePager",
-                contentScale = ContentScale.Crop
-            )
+    Scaffold(
+        topBar = {
+            Column {
+                CustomTopAppBar(navController = navController)
+                CustomTopAppBarSecond(navController = navController)
+            }
+        },
+        bottomBar = {
+            CustomBottomAppBar(navController = navController)
         }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .background(Color(0xFF1B1B1B))
+                .padding(innerPadding)  // 패딩 적용
+                .padding(all = 10.dp)
+        ) {
 
-        HomeLazyRow(
-            title = "믿고 보는 웨이브 에디터 추천작",
-            images = images,
-            height = 230,
-            width = 140,
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+            val images = listOf(
+                R.drawable.food_pic1,
+                R.drawable.food_pic2,
+                R.drawable.food_pic3,
+                R.drawable.food_pic4,
+                R.drawable.food_pic5
+            )
 
-        HomeLazyRow(
-            title = "실시간 인기 콘텐츠",
-            images = images,
-            height = 230,
-            width = 140,
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+            val pagerState = rememberPagerState { images.size }
 
-        HomeLazyRow(
-            title = "오직 웨이브에서",
-            images = images,
-            height = 230,
-            width = 140,
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(400.dp)
+            ) { idx ->
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .clip(RoundedCornerShape(16.dp)),
+                    painter = painterResource(id = images[idx]),
+                    contentDescription = "imagePager",
+                    contentScale = ContentScale.Crop
+                )
+            }
 
-        HomeLazyRow(
-            title = "오늘의 TOP 20",
-            images = images,
-            height = 260,
-            width = 180,
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+            HomeLazyRow(
+                title = "믿고 보는 웨이브 에디터 추천작",
+                images = images,
+                height = 230,
+                width = 140,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
 
-        HomeLazyRow(
-            title = "당한 대로 갚아줄게",
-            images = images,
-            height = 230,
-            width = 140,
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+            HomeLazyRow(
+                title = "실시간 인기 콘텐츠",
+                images = images,
+                height = 230,
+                width = 140,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
 
+            HomeLazyRow(
+                title = "오직 웨이브에서",
+                images = images,
+                height = 230,
+                width = 140,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            HomeLazyRow(
+                title = "오늘의 TOP 20",
+                images = images,
+                height = 260,
+                width = 180,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            HomeLazyRow(
+                title = "당한 대로 갚아줄게",
+                images = images,
+                height = 230,
+                width = 140,
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+        }
     }
-
 }
+
+
 
 @Preview(showBackground = true)
 @Composable
@@ -244,9 +218,15 @@ fun HomeScreenPreview() {
                     navController = navController,
                     startDestination = "home",
                 ){
-                    composable("home") {HomeScreen()}
-                    composable("search") {SearchScreen()}
-                    composable("profile") {MypageScreen()}
+                    composable("home") {HomeScreen(
+                        navController = navController
+                    )}
+                    composable("search") {SearchScreen(
+                        navController = navController
+                    )}
+                    composable("profile") {MypageScreen(
+                        navController = navController,
+                    )}
                 }
             }
 

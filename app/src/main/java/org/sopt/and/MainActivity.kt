@@ -11,26 +11,25 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import org.sopt.and.presentation.LoginScreen.LoginScreen
+import org.sopt.and.presentation.mypageScreen.MypageScreen
+import org.sopt.and.presentation.searchScreen.SearchScreen
+import org.sopt.and.presentation.signupScreen.SignUpScreen
+import org.sopt.and.presentation.homeScreen.HomeScreen
+import org.sopt.and.presentation.homeScreen.HomeViewModel
+import org.sopt.and.presentation.main.UserViewModel
+import org.sopt.and.presentation.mypageScreen.MypageViewModel
 
-//로그인 성공 시 로그인한 이메일을 viewmodel에 담아 전역변수로 관리..
-class UserViewModel : ViewModel() {
+//로그인 성공 시 로그인한 이메일을 담아서
+// 전역변수로 관리했던 UserViewModel을
+// 따로 분리함
 
-    private val _email = MutableLiveData<String>()
-    val email: LiveData<String> = _email
-
-    fun setEmail(newEmail: String) {
-        _email.value = newEmail
-    }
-}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +48,8 @@ class MainActivity : ComponentActivity() {
                     ){
                         composable<SignUpScreen> {
                             SignUpScreen(
-                                navigateToLoginScreen = {
-                                    emailText, passwordText -> navController.navigate(LoginScreen(emailText, passwordText))
+                                navigateToLoginScreen = { emailText, passwordText ->
+                                    navController.navigate(LoginScreen(emailText, passwordText))
                                 }
                             )
                         }
@@ -73,6 +72,7 @@ class MainActivity : ComponentActivity() {
                         composable("home") {
                             HomeScreen(
                                 navController = navController,
+                                homeViewModel = HomeViewModel()
                             )
                         }
 
@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
 
                             MypageScreen(
                                 navController = navController,
-                                userViewModel = userViewModel
+                                mypageViewModel = MypageViewModel()
                             )
                         }
 

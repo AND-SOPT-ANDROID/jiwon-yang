@@ -1,6 +1,5 @@
-package org.sopt.and
+package org.sopt.and.presentation.LoginScreen
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,12 +19,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +32,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import org.sopt.and.presentation.signupScreen.EmailValidCheck
+import org.sopt.and.presentation.signupScreen.PasswordValidCheck
+import org.sopt.and.R
+import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
@@ -53,19 +55,15 @@ fun LoginScreen(
     emailText: String,
     passwordText: String,
     navigateToHomeScreen: () -> Unit,
-    userViewModel: UserViewModel = viewModel()
+    userViewModel: UserViewModel = viewModel(),
+    loginViewModel: LoginViewModel = viewModel()
 ) {
 
-    var inputEmail: String = ""
-    var inputPassword: String = ""
-
-    var emailState = remember { mutableStateOf(inputEmail) }
-    var passwordState = remember { mutableStateOf(inputPassword) }
-
-    var isEmailValid = remember { mutableStateOf(true) }
-    var isPasswordValid = remember { mutableStateOf(true) }
-
-    var shouldShowPassword = remember { mutableStateOf(false) }
+    var emailState = loginViewModel.emailState.collectAsState().value
+    var passwordState = loginViewModel.passwordState.collectAsState().value
+    var isEmailValid = loginViewModel.isEmailValid.collectAsState().value
+    var isPasswordValid = loginViewModel.isPasswordValid.collectAsState().value
+    var shouldShowPassword = loginViewModel.shouldShowPassword.collectAsState().value
 
     Scaffold(
         modifier = modifier,
@@ -94,13 +92,13 @@ fun LoginScreen(
 
             // Email 입력 필드
             SignUpTextField(
-                text = emailState.value,
+                text = emailState,
                 onValueChange = { newValue ->
-                    emailState.value = newValue
-                    isEmailValid.value = EmailValidCheck(emailState.value)
+                    loginViewModel.onEmailChange(newValue)
+                    isEmailValid = EmailValidCheck(emailState)
                 },
                 fieldType = "Email",
-                conditionCheck = isEmailValid.value,
+                conditionCheck = isEmailValid,
                 errMessage = "올바른 이메일 형식이 아닙니다.",
                 placeholder = "wavve@example.com",
             )
@@ -109,18 +107,19 @@ fun LoginScreen(
 
             // Password 입력 필드
             SignUpTextField(
-                text = passwordState.value,
+                text = passwordState,
                 onValueChange = { newValue ->
-                    passwordState.value = newValue
-                    isPasswordValid.value = PasswordValidCheck(passwordState.value)
+                    loginViewModel.onPasswordChange(newValue)
+                    isPasswordValid = PasswordValidCheck(passwordState)
                 },
                 fieldType = "Password",
-                conditionCheck = isPasswordValid.value,
+                conditionCheck = isPasswordValid,
                 errMessage = "올바른 비밀번호 형식이 아닙니다.",
                 placeholder = "Wavve 비밀번호 설정",
-                shouldShowPassword = shouldShowPassword.value,
+                shouldShowPassword = shouldShowPassword,
                 onPasswordVisibilityChange = {
-                    shouldShowPassword.value = !shouldShowPassword.value
+//                    shouldShowPassword = !shouldShowPassword
+                    loginViewModel.togglePasswordVisibility()
                 },
             )
 
@@ -132,7 +131,7 @@ fun LoginScreen(
                     var loginMessage = ""
                     var loginSuccessFlag = 0
 
-                    if (emailState.value == emailText && passwordState.value == passwordText) {
+                    if (loginViewModel.isLoginValid(emailText, passwordText)) {
                         loginMessage = "로그인 성공"
                         loginSuccessFlag = 1
                     } else {
@@ -143,7 +142,7 @@ fun LoginScreen(
                         val snackbarResult = snackbarHostState.showSnackbar(loginMessage)
 
                         if (loginSuccessFlag == 1 && snackbarResult == SnackbarResult.Dismissed) {
-                            userViewModel.setEmail(emailState.value)
+                            userViewModel.setEmail(emailState)
                             navigateToHomeScreen()
                         }
                     }

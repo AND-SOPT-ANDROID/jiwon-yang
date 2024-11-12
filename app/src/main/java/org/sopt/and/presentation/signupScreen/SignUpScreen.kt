@@ -1,26 +1,18 @@
-package org.sopt.and
+package org.sopt.and.presentation.signupScreen
 
-import android.content.Intent
-import android.os.Bundle
 import android.util.Patterns
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -30,10 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
+import kotlin.math.sign
 
 @Serializable
 data object SignUpScreen
@@ -59,20 +53,17 @@ fun PasswordValidCheck(password: String): Boolean {
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     navigateToLoginScreen: (emailText: String, passwordText: String) -> Unit,
+    signUpViewModel: SignUpViewModel = viewModel()
 ) {
 
     val context = LocalContext.current
-
-    var emailFlag = 0
-    var passwordFlag = 0 //8~20자 이내 조건 확인
     var toastMessage = ""
 
-    var emailText = remember { mutableStateOf("") }
-    var passwordText = remember { mutableStateOf("") }
-
-    var shouldShowPassword = remember {mutableStateOf(false)}
-    var isEmailValid = remember { mutableStateOf(true) }
-    var isPasswordValid = remember { mutableStateOf(true) }
+    var emailText = signUpViewModel.emailText.collectAsState().value
+    var passwordText = signUpViewModel.passwordText.collectAsState().value
+    var isEmailValid = signUpViewModel.isEmailValid.collectAsState().value
+    var isPasswordValid = signUpViewModel.isPasswordValid.collectAsState().value
+    var shouldShowPassword = signUpViewModel.shouldShowPassword.collectAsState().value
 
     Column(
         modifier = Modifier
@@ -100,13 +91,13 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.weight(0.25f))
 
         SignUpTextField(
-            text = emailText.value,
+            text = emailText,
             onValueChange = { newValue ->
-                emailText.value = newValue
-                isEmailValid.value = EmailValidCheck(emailText.value)
+                signUpViewModel.onEmailChange(newValue)
+                isEmailValid = EmailValidCheck(emailText)
             },
             fieldType = "Email",
-            conditionCheck = isEmailValid.value,
+            conditionCheck = isEmailValid,
             errMessage = "올바른 이메일 형식이 아닙니다.",
             placeholder = "wavve@example.com",
             descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확한 이메일을 입력해주세요.",
@@ -115,18 +106,18 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.weight(0.15f))
 
         SignUpTextField(
-            text = passwordText.value,
+            text = passwordText,
             onValueChange = { newValue ->
-                passwordText.value = newValue
-                isPasswordValid.value = PasswordValidCheck(passwordText.value)
+                signUpViewModel.onPasswordChange(newValue)
+                isPasswordValid = PasswordValidCheck(passwordText)
             },
             fieldType = "Password",
-            conditionCheck = isPasswordValid.value,
+            conditionCheck = isPasswordValid,
             errMessage = "올바른 비밀번호 형식이 아닙니다.",
             placeholder = "Wavve 비밀번호 설정",
-            shouldShowPassword = shouldShowPassword.value,
+            shouldShowPassword = shouldShowPassword,
             onPasswordVisibilityChange = {
-                shouldShowPassword.value = !shouldShowPassword.value
+                signUpViewModel.togglePasswordVisibility()
             },
             descriptionText = "비밀번호는 8~20자 이내로 영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용하여 입력해 주세요.",
         )
@@ -145,24 +136,22 @@ fun SignUpScreen(
                 .clickable {
 
                     //이메일 형식 조건 검사
-                    if (!EmailValidCheck(emailText.value)) {
-                        emailFlag = 1
+                    if (!EmailValidCheck(emailText)) {
                         toastMessage = "형식에 맞는 이메일을 입력하세요"
 
                     }
 
                     //비밀번호 형식 조건 검사
-                    if (!PasswordValidCheck(passwordText.value)) {
-                        passwordFlag = 1
+                    if (!PasswordValidCheck(passwordText)) {
                         toastMessage = "조건에 맞는 비밀번호를 사용하세요"
                     }
 
-                    if (emailFlag == 0 && passwordFlag == 0) {
+                    if (signUpViewModel.isSignUpValid()) {
 
                         toastMessage = "로그인 되었습니다"
 
                         //전달해줄 인자를 이 안에 넣으면 되는 듯..
-                        navigateToLoginScreen(emailText.value, passwordText.value)
+                        navigateToLoginScreen(emailText, passwordText)
                         println("네비게이트는 지남...")
                     }
 

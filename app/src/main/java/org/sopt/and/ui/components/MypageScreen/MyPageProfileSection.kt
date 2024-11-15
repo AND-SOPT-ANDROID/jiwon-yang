@@ -27,7 +27,7 @@ import org.sopt.and.R
 
 @Composable
 fun MyPageProfileSection(
-    deliveredEmail: String,
+    deliveredUserName: String,
 ){
 
     Column(
@@ -52,7 +52,7 @@ fun MyPageProfileSection(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                "${deliveredEmail}님",
+                "${deliveredUserName}님",
                 color = Color.White
             )
             Spacer(modifier = Modifier.weight(0.5f))

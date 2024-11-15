@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 fun SignUpTextField(
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit,
-    fieldType: String, //Email 혹은 Password로 전달 예정
+    fieldType: String, //Username 혹은 Password로 전달 예정
     text: String,
     conditionCheck: Boolean,
     errMessage: String,

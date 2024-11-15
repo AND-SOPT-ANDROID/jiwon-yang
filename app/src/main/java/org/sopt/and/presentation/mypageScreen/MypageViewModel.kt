@@ -11,8 +11,8 @@ class MypageViewModel : ViewModel() {
     private val _user = MutableStateFlow(UserViewModel())
     val user: StateFlow<UserViewModel> = _user
 
-    fun getUserEmail(): String {
-        return _user.value.email.toString()
+    fun getUserName(): String {
+        return _user.value.userName.toString()
     }
 
 }

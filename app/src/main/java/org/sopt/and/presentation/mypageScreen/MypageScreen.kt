@@ -30,11 +30,12 @@ import org.sopt.and.presentation.main.UserViewModel
 @Composable
 fun MypageScreen(
     navController: NavController,
-    //userViewModel: UserViewModel = viewModel(),  //viewModel이 짬뽕됐는데 뭘 어디서 써야하는지..? 명확X..
+    userViewModel: UserViewModel = viewModel(),
     mypageViewModel: MypageViewModel = viewModel()
 ) {
 
-    val user = mypageViewModel.user.collectAsState().value
+    var userNameText = userViewModel.userName.collectAsState().value
+    //val userName = userViewModel.userName
 
     Scaffold(
         bottomBar = {
@@ -48,7 +49,7 @@ fun MypageScreen(
                 .padding(innerPadding)
         ) {
             MyPageProfileSection(
-                deliveredEmail = mypageViewModel.getUserEmail()
+                deliveredUserName = userNameText
             )
             Spacer(modifier = Modifier.height(0.5.dp))
             MyPageProfileSection2(

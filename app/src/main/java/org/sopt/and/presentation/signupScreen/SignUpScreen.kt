@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
+import org.sopt.and.model.dto.RequestCreateUserDto
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
@@ -32,15 +33,15 @@ import kotlin.math.sign
 @Serializable
 data object SignUpScreen
 
-fun EmailValidCheck(email: String): Boolean {
+fun StringInputValidCheck(newString: String): Boolean {
     var isValid = false
-    val inputStr : CharSequence = email
-    val pattern = Patterns.EMAIL_ADDRESS
-    val matcher = pattern.matcher(inputStr)
-    if(matcher.matches()){
-        isValid = true
+    val inputStr : CharSequence = newString
+
+    if(inputStr.length >= 8){
+        return isValid
+    } else {
+        return !isValid
     }
-    return isValid
 }
 
 fun PasswordValidCheck(password: String): Boolean {
@@ -52,17 +53,19 @@ fun PasswordValidCheck(password: String): Boolean {
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    navigateToLoginScreen: (emailText: String, passwordText: String) -> Unit,
+    navigateToLoginScreen: (userNameText: String, passwordText: String) -> Unit,
     signUpViewModel: SignUpViewModel = viewModel()
 ) {
 
     val context = LocalContext.current
     var toastMessage = ""
 
-    var emailText = signUpViewModel.emailText.collectAsState().value
+    var userNameText = signUpViewModel.userNameText.collectAsState().value
     var passwordText = signUpViewModel.passwordText.collectAsState().value
-    var isEmailValid = signUpViewModel.isEmailValid.collectAsState().value
+    var hobbyText = signUpViewModel.hobbyText.collectAsState().value
+    var isUserNameValid = signUpViewModel.isUserNameValid.collectAsState().value
     var isPasswordValid = signUpViewModel.isPasswordValid.collectAsState().value
+    var isHobbyValid = signUpViewModel.isHobbyValid.collectAsState().value
     var shouldShowPassword = signUpViewModel.shouldShowPassword.collectAsState().value
 
     Column(
@@ -83,7 +86,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.weight(0.35f))
 
         Text(
-            "이메일과 비밀번호만으로\nWavve를 즐길 수 있어요!",
+            "유저 이름, 비밀번호, 취미 입력만으로\nWavve를 즐길 수 있어요!",
             color = Color.White,
             fontSize = 21.sp
         )
@@ -91,16 +94,16 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.weight(0.25f))
 
         SignUpTextField(
-            text = emailText,
+            text = userNameText,
             onValueChange = { newValue ->
-                signUpViewModel.onEmailChange(newValue)
-                isEmailValid = EmailValidCheck(emailText)
+                signUpViewModel.onUserNameChange(newValue)
+                isUserNameValid = StringInputValidCheck(userNameText)
             },
-            fieldType = "Email",
-            conditionCheck = isEmailValid,
-            errMessage = "올바른 이메일 형식이 아닙니다.",
-            placeholder = "wavve@example.com",
-            descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확한 이메일을 입력해주세요.",
+            fieldType = "userName",
+            conditionCheck = isUserNameValid,
+            errMessage = "유저 이름은 7자 이하여야 합니다.",
+            placeholder = "유저 이름 (7자 이하)",
+            descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확하게 입력해주세요.",
         )
 
         Spacer(modifier = Modifier.weight(0.15f))
@@ -122,6 +125,19 @@ fun SignUpScreen(
             descriptionText = "비밀번호는 8~20자 이내로 영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용하여 입력해 주세요.",
         )
 
+        SignUpTextField(
+            text = hobbyText,
+            onValueChange = { newValue ->
+                signUpViewModel.onHobbyChange(newValue)
+                isHobbyValid = StringInputValidCheck(hobbyText)
+            },
+            fieldType = "hobby",
+            conditionCheck = isHobbyValid,
+            errMessage = "취미은 7자 이하여야 합니다.",
+            placeholder = "취미 입력",
+            //descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확하게 입력해주세요.",
+        )
+
         Spacer(modifier = Modifier.weight(0.5f))
         SocialLoginSection(modifier = modifier)
         Spacer(modifier = Modifier.weight(1f))
@@ -135,9 +151,9 @@ fun SignUpScreen(
                 .padding(vertical = 13.dp)
                 .clickable {
 
-                    //이메일 형식 조건 검사
-                    if (!EmailValidCheck(emailText)) {
-                        toastMessage = "형식에 맞는 이메일을 입력하세요"
+                    //유저 네임 형식 조건 검사
+                    if (!StringInputValidCheck(userNameText)) {
+                        toastMessage = "형식에 맞는 유저 네임을 입력하세요"
 
                     }
 
@@ -148,11 +164,18 @@ fun SignUpScreen(
 
                     if (signUpViewModel.isSignUpValid()) {
 
-                        toastMessage = "로그인 되었습니다"
+                        /* 새로 회원가입한 정보 저장 */
+                        val newUser = RequestCreateUserDto(
+                            userName = userNameText,
+                            password = passwordText,
+                            hobby = hobbyText
+                        )
+                        signUpViewModel.createNewUser(newUser)
 
-                        //전달해줄 인자를 이 안에 넣으면 되는 듯..
-                        navigateToLoginScreen(emailText, passwordText)
-                        println("네비게이트는 지남...")
+                        toastMessage = "회원가입에 성공하였습니다."
+
+
+                        navigateToLoginScreen(userNameText, passwordText)
                     }
 
                     Toast
@@ -173,8 +196,8 @@ fun SignUpPreview() {
     ANDANDROIDTheme {
         SignUpScreen(
             navigateToLoginScreen = {
-                email, password ->
-                println("email: $email, password: $password")
+                userName, password ->
+                println("userName: $userName, password: $password")
             }
         )
     }

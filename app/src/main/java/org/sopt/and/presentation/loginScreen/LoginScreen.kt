@@ -1,4 +1,4 @@
-package org.sopt.and.presentation.LoginScreen
+package org.sopt.and.presentation.loginScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,7 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import org.sopt.and.presentation.signupScreen.EmailValidCheck
+import org.sopt.and.presentation.signupScreen.StringInputValidCheck
 import org.sopt.and.presentation.signupScreen.PasswordValidCheck
 import org.sopt.and.R
 import org.sopt.and.presentation.main.UserViewModel
@@ -43,7 +43,7 @@ import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Serializable
 data class LoginScreen(
-    val emailText: String,
+    val userNameText: String,
     val passwordText: String
 )
 
@@ -52,16 +52,16 @@ fun LoginScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     scope: CoroutineScope,
     snackbarHostState: SnackbarHostState,
-    emailText: String,
+    userNameText: String,
     passwordText: String,
     navigateToHomeScreen: () -> Unit,
     userViewModel: UserViewModel = viewModel(),
     loginViewModel: LoginViewModel = viewModel()
 ) {
 
-    var emailState = loginViewModel.emailState.collectAsState().value
+    var userNameState = loginViewModel.userNameState.collectAsState().value
     var passwordState = loginViewModel.passwordState.collectAsState().value
-    var isEmailValid = loginViewModel.isEmailValid.collectAsState().value
+    var isUserNameValid = loginViewModel.isUserNameValid.collectAsState().value
     var isPasswordValid = loginViewModel.isPasswordValid.collectAsState().value
     var shouldShowPassword = loginViewModel.shouldShowPassword.collectAsState().value
 
@@ -90,17 +90,17 @@ fun LoginScreen(
                 )
             }
 
-            // Email 입력 필드
+            // UserName 입력 필드
             SignUpTextField(
-                text = emailState,
+                text = userNameState,
                 onValueChange = { newValue ->
-                    loginViewModel.onEmailChange(newValue)
-                    isEmailValid = EmailValidCheck(emailState)
+                    loginViewModel.onUserNameChange(newValue)
+                    isUserNameValid = StringInputValidCheck(userNameState)
                 },
-                fieldType = "Email",
-                conditionCheck = isEmailValid,
-                errMessage = "올바른 이메일 형식이 아닙니다.",
-                placeholder = "wavve@example.com",
+                fieldType = "UserName",
+                conditionCheck = isUserNameValid,
+                errMessage = "유저 이름은 7자 이하여야 합니다.",
+                placeholder = "유저 이름 (7자 이하)",
             )
 
             Spacer(modifier = Modifier.weight(0.025f))
@@ -131,18 +131,25 @@ fun LoginScreen(
                     var loginMessage = ""
                     var loginSuccessFlag = 0
 
-                    if (loginViewModel.isLoginValid(emailText, passwordText)) {
+                    if (loginViewModel.isLoginValid(userNameText, passwordText)) {
                         loginMessage = "로그인 성공"
                         loginSuccessFlag = 1
+
+                        /* TODO: 로그인 성공한 유저네임 갖고, 저장된 유저의 정보 가져오기.
+                        *   로그인 성공 시, response로 돌아오는 token 값을 넘겨주기 */
+
+                        userViewModel.setUserName(userNameText)
+
+
                     } else {
-                        loginMessage = "알맞은 이메일과 비밀번호를 입력하세요"
+                        loginMessage = "알맞은 유저 이름과 비밀번호를 입력하세요"
                     }
 
                     scope.launch {
                         val snackbarResult = snackbarHostState.showSnackbar(loginMessage)
 
                         if (loginSuccessFlag == 1 && snackbarResult == SnackbarResult.Dismissed) {
-                            userViewModel.setEmail(emailState)
+                            userViewModel.setUserName(userNameState)
                             navigateToHomeScreen()
                         }
                     }
@@ -186,7 +193,7 @@ fun LoginScreenPreview2() {
         LoginScreen(
             scope = scope,
             snackbarHostState = snackbarHostState,
-            emailText = "",
+            userNameText = "",
             passwordText = "",
             navigateToHomeScreen = {},
         )

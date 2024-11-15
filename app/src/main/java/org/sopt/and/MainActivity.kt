@@ -17,7 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import org.sopt.and.presentation.LoginScreen.LoginScreen
+import org.sopt.and.presentation.loginScreen.LoginScreen
 import org.sopt.and.presentation.mypageScreen.MypageScreen
 import org.sopt.and.presentation.searchScreen.SearchScreen
 import org.sopt.and.presentation.signupScreen.SignUpScreen
@@ -25,11 +25,6 @@ import org.sopt.and.presentation.homeScreen.HomeScreen
 import org.sopt.and.presentation.homeScreen.HomeViewModel
 import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.presentation.mypageScreen.MypageViewModel
-
-//로그인 성공 시 로그인한 이메일을 담아서
-// 전역변수로 관리했던 UserViewModel을
-// 따로 분리함
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +35,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController = rememberNavController()
                     val userViewModel: UserViewModel = viewModel()
+                    val mypageViewModel : MypageViewModel = viewModel()
 
                     NavHost(
                         navController = navController,
@@ -48,8 +44,8 @@ class MainActivity : ComponentActivity() {
                     ){
                         composable<SignUpScreen> {
                             SignUpScreen(
-                                navigateToLoginScreen = { emailText, passwordText ->
-                                    navController.navigate(LoginScreen(emailText, passwordText))
+                                navigateToLoginScreen = { userNameText, passwordText ->
+                                    navController.navigate(LoginScreen(userNameText, passwordText))
                                 }
                             )
                         }
@@ -59,13 +55,14 @@ class MainActivity : ComponentActivity() {
                             val scope = rememberCoroutineScope()
                             val snackbarHostState = remember { SnackbarHostState() }
                             LoginScreen(
-                                emailText = item.emailText,
+                                userNameText = item.userNameText,
                                 passwordText = item.passwordText,
                                 scope = scope,
                                 snackbarHostState = snackbarHostState,
                                 navigateToHomeScreen = {
                                     navController.navigate("home")
-                                }
+                                },
+                                userViewModel = userViewModel
                             )
                         }
 
@@ -86,7 +83,8 @@ class MainActivity : ComponentActivity() {
 
                             MypageScreen(
                                 navController = navController,
-                                mypageViewModel = MypageViewModel()
+                                userViewModel = userViewModel,
+                                mypageViewModel = mypageViewModel
                             )
                         }
 

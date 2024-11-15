@@ -35,7 +35,10 @@ import kotlinx.serialization.Serializable
 import org.sopt.and.presentation.signupScreen.StringInputValidCheck
 import org.sopt.and.presentation.signupScreen.PasswordValidCheck
 import org.sopt.and.R
+import org.sopt.and.model.dto.login.RequestGetUserDto
+import org.sopt.and.model.dto.signup.RequestCreateUserDto
 import org.sopt.and.presentation.main.UserViewModel
+import org.sopt.and.presentation.mypageScreen.MypageViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
@@ -56,7 +59,9 @@ fun LoginScreen(
     passwordText: String,
     navigateToHomeScreen: () -> Unit,
     userViewModel: UserViewModel = viewModel(),
-    loginViewModel: LoginViewModel = viewModel()
+    mypageViewModel: MypageViewModel = viewModel(),
+    loginViewModel: LoginViewModel = remember { LoginViewModel(mypageViewModel) },
+
 ) {
 
     var userNameState = loginViewModel.userNameState.collectAsState().value
@@ -118,7 +123,6 @@ fun LoginScreen(
                 placeholder = "Wavve 비밀번호 설정",
                 shouldShowPassword = shouldShowPassword,
                 onPasswordVisibilityChange = {
-//                    shouldShowPassword = !shouldShowPassword
                     loginViewModel.togglePasswordVisibility()
                 },
             )
@@ -135,10 +139,21 @@ fun LoginScreen(
                         loginMessage = "로그인 성공"
                         loginSuccessFlag = 1
 
-                        /* TODO: 로그인 성공한 유저네임 갖고, 저장된 유저의 정보 가져오기.
-                        *   로그인 성공 시, response로 돌아오는 token 값을 넘겨주기 */
+                        /* 로그인한 유저의 userName만 가지고 해당 유저의 정보 불러와야 함 */
+                        val loginedUser = RequestGetUserDto(
+                            userName = userNameText,
+                        )
 
+                        //로그인 성공 시, token 값을 저장해 줌
+                        loginViewModel.logInUser(loginedUser, userViewModel)
+
+                        /*TODO: 백엔드 연결 후 해당 코드 삭제*/
                         userViewModel.setUserName(userNameText)
+
+
+
+
+
 
 
                     } else {

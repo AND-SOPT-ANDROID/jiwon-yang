@@ -35,7 +35,7 @@ fun MypageScreen(
 ) {
 
     var userNameText = userViewModel.userName.collectAsState().value
-    //val userName = userViewModel.userName
+    val userHobby = userViewModel.hobby.collectAsState().value
 
     Scaffold(
         bottomBar = {
@@ -49,7 +49,8 @@ fun MypageScreen(
                 .padding(innerPadding)
         ) {
             MyPageProfileSection(
-                deliveredUserName = userNameText
+                deliveredUserName = userNameText,
+                deliveredUserHobby = userHobby
             )
             Spacer(modifier = Modifier.height(0.5.dp))
             MyPageProfileSection2(

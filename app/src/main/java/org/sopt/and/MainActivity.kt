@@ -62,7 +62,8 @@ class MainActivity : ComponentActivity() {
                                 navigateToHomeScreen = {
                                     navController.navigate("home")
                                 },
-                                userViewModel = userViewModel
+                                userViewModel = userViewModel,
+                                mypageViewModel = mypageViewModel
                             )
                         }
 

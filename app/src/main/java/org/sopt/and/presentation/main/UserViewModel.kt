@@ -15,12 +15,19 @@ class UserViewModel : ViewModel() {
     private val _hobby = MutableStateFlow("")
     val hobby: StateFlow<String> = _hobby
 
+    private val _loginToken = MutableStateFlow("")
+    val loginToken: StateFlow<String> = _loginToken
+
     fun setUserName(newUserName: String) {
         _userName.value = newUserName
     }
 
-    fun setHobby(newHobbyString: String) {
-        _hobby.value = newHobbyString
+    fun setHobby(newHobby: String) {
+        _hobby.value = newHobby
+    }
+
+    fun setLoginToken(newToken: String) {
+        _loginToken.value = newToken
     }
 
 }

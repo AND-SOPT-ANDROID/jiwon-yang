@@ -28,7 +28,11 @@ import org.sopt.and.R
 @Composable
 fun MyPageProfileSection(
     deliveredUserName: String,
+    deliveredUserHobby: String?,
 ){
+
+    //임시 값 삽입
+    val hobby = deliveredUserHobby ?: "eating"
 
     Column(
         modifier = Modifier
@@ -52,7 +56,7 @@ fun MyPageProfileSection(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                "${deliveredUserName}님",
+                "요즘 ${hobby}를 즐기는\n${deliveredUserName}님",
                 color = Color.White
             )
             Spacer(modifier = Modifier.weight(0.5f))

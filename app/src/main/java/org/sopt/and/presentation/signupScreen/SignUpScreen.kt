@@ -1,6 +1,5 @@
 package org.sopt.and.presentation.signupScreen
 
-import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -13,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -24,11 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.serialization.Serializable
-import org.sopt.and.model.dto.RequestCreateUserDto
+import org.sopt.and.model.dto.signup.RequestCreateUserDto
+import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
-import kotlin.math.sign
 
 @Serializable
 data object SignUpScreen
@@ -135,7 +132,6 @@ fun SignUpScreen(
             conditionCheck = isHobbyValid,
             errMessage = "취미은 7자 이하여야 합니다.",
             placeholder = "취미 입력",
-            //descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확하게 입력해주세요.",
         )
 
         Spacer(modifier = Modifier.weight(0.5f))
@@ -173,7 +169,6 @@ fun SignUpScreen(
                         signUpViewModel.createNewUser(newUser)
 
                         toastMessage = "회원가입에 성공하였습니다."
-
 
                         navigateToLoginScreen(userNameText, passwordText)
                     }

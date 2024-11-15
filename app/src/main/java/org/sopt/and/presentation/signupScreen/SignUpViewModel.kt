@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.sopt.and.model.dto.RequestCreateUserDto
-import org.sopt.and.model.dto.ResponseCreateUserWrapperDto
+import org.sopt.and.model.dto.signup.RequestCreateUserDto
+import org.sopt.and.model.dto.signup.ResponseCreateUserWrapperDto
 import org.sopt.and.model.network.ServicePool
 import retrofit2.Call
 import retrofit2.Callback
@@ -68,7 +68,8 @@ class SignUpViewModel : ViewModel() {
     fun createNewUser(request: RequestCreateUserDto) {
         val TAG = "UserService"
 
-        ServicePool.userService.signUpUser(request).enqueue(object : Callback<ResponseCreateUserWrapperDto> {
+        userService.signUpUser(request).enqueue(object : Callback<ResponseCreateUserWrapperDto> {
+
             override fun onResponse(
                 call: Call<ResponseCreateUserWrapperDto>,
                 response: Response<ResponseCreateUserWrapperDto>
@@ -76,17 +77,17 @@ class SignUpViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     val body = response.body()
                     if (body != null) {
-                        Log.d(TAG, "User successfully created with no: ${body.data.result.no}")
+                        Log.d(TAG, "유저 생성 성공 ${body.success.result.no}")
                     } else {
-                        Log.e(TAG, "Response body is null")
+                        Log.e(TAG, "유저 생성 에러")
                     }
                 } else {
-                    Log.e(TAG, "Failed with error code: ${response.code()}")
+                    Log.e(TAG, "유저 생성 에러 ${response.code()}")
                 }
             }
 
             override fun onFailure(call: Call<ResponseCreateUserWrapperDto>, t: Throwable) {
-                Log.e(TAG, "Error during API call: ${t.message}")
+                Log.e(TAG, "API 호출 도중 에러 발생: ${t.message}")
             }
         })
     }

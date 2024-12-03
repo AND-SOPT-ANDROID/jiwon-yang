@@ -46,7 +46,10 @@ class MainActivity : ComponentActivity() {
                         composable<SignUpScreen> {
                             SignUpScreen(
                                 navigateToLoginScreen = { user ->
-                                    User(user.name, user.password)
+                                    navController.navigate(LoginScreen(user.name, user.password)){
+                                        popUpTo(SignUpScreen) { inclusive = true }
+                                        launchSingleTop = true
+                                    }
                                 }
                             )
                         }

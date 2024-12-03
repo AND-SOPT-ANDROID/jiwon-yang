@@ -20,6 +20,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -35,8 +36,8 @@ import kotlinx.serialization.Serializable
 import org.sopt.and.presentation.signupScreen.StringInputValidCheck
 import org.sopt.and.presentation.signupScreen.PasswordValidCheck
 import org.sopt.and.R
-import org.sopt.and.model.dto.login.RequestGetUserDto
-import org.sopt.and.model.dto.signup.RequestCreateUserDto
+import org.sopt.and.data.dto.login.RequestGetUserDto
+import org.sopt.and.data.dto.signup.RequestCreateUserDto
 import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.presentation.mypageScreen.MypageViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
@@ -53,27 +54,25 @@ data class LoginScreen(
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    userNameText: String,
-    passwordText: String,
     navigateToHomeScreen: () -> Unit,
-    userViewModel: UserViewModel = viewModel(),
-    mypageViewModel: MypageViewModel = viewModel(),
-    loginViewModel: LoginViewModel = remember { LoginViewModel(mypageViewModel) },
-
+    loginViewModel: LoginViewModel,
 ) {
 
-    var userNameState = loginViewModel.userNameState.collectAsState().value
-    var passwordState = loginViewModel.passwordState.collectAsState().value
+    var userNameText = remember { mutableStateOf("") }
+    var passwordText = remember { mutableStateOf("") }
+
     var isUserNameValid = loginViewModel.isUserNameValid.collectAsState().value
     var isPasswordValid = loginViewModel.isPasswordValid.collectAsState().value
     var shouldShowPassword = loginViewModel.shouldShowPassword.collectAsState().value
+    val loginResult = loginViewModel.loginResult.collectAsState().value
+
+    val coroutineScope = rememberCoroutineScope()
+    val snackBarHostState = remember {SnackbarHostState()}
 
     Scaffold(
         modifier = modifier,
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackBarHostState)
         }
     ) { innerPadding ->
         Column(
@@ -97,10 +96,10 @@ fun LoginScreen(
 
             // UserName 입력 필드
             SignUpTextField(
-                text = userNameState,
+                text = userNameText.value,
                 onValueChange = { newValue ->
                     loginViewModel.onUserNameChange(newValue)
-                    isUserNameValid = StringInputValidCheck(userNameState)
+                    isUserNameValid = StringInputValidCheck(userNameText.value)
                 },
                 fieldType = "UserName",
                 conditionCheck = isUserNameValid,
@@ -112,10 +111,10 @@ fun LoginScreen(
 
             // Password 입력 필드
             SignUpTextField(
-                text = passwordState,
+                text = passwordText.value,
                 onValueChange = { newValue ->
                     loginViewModel.onPasswordChange(newValue)
-                    isPasswordValid = PasswordValidCheck(passwordState)
+                    isPasswordValid = PasswordValidCheck(passwordText.value)
                 },
                 fieldType = "Password",
                 conditionCheck = isPasswordValid,
@@ -135,39 +134,34 @@ fun LoginScreen(
                     var loginMessage = ""
                     var loginSuccessFlag = 0
 
-                    if (loginViewModel.isLoginValid(userNameText, passwordText)) {
+                    if (loginViewModel.isLoginValid(userNameText.value, passwordText.value)) {
                         loginMessage = "로그인 성공"
                         loginSuccessFlag = 1
 
-                        /* 로그인한 유저의 userName만 가지고 해당 유저의 정보 불러와야 함 */
-                        val loginedUser = RequestGetUserDto(
-                            userName = userNameText,
-                        )
+                        //입력받은 유저네임과 패스워드를 보내기
+                        coroutineScope.launch {
+                            loginViewModel.logInUser()
+                        }
+
 
                         //로그인 성공 시, token 값을 저장해 줌
-                        loginViewModel.logInUser(loginedUser, userViewModel)
+//                        loginViewModel.logInUser(loginedUser, userViewModel)
 
                         /*TODO: 백엔드 연결 후 해당 코드 삭제*/
-                        userViewModel.setUserName(userNameText)
-
-
-
-
-
-
+//                        userViewModel.setUserName(userNameText)
 
                     } else {
                         loginMessage = "알맞은 유저 이름과 비밀번호를 입력하세요"
                     }
 
-                    scope.launch {
-                        val snackbarResult = snackbarHostState.showSnackbar(loginMessage)
-
-                        if (loginSuccessFlag == 1 && snackbarResult == SnackbarResult.Dismissed) {
-                            userViewModel.setUserName(userNameState)
-                            navigateToHomeScreen()
-                        }
-                    }
+//                    scope.launch {
+//                        val snackbarResult = snackbarHostState.showSnackbar(loginMessage)
+//
+//                        if (loginSuccessFlag == 1 && snackbarResult == SnackbarResult.Dismissed) {
+//                            userViewModel.setUserName(userNameState)
+//                            navigateToHomeScreen()
+//                        }
+//                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth()
@@ -199,18 +193,13 @@ fun LoginScreen(
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview2() {
-    ANDANDROIDTheme {
-        val scope = rememberCoroutineScope()
-        val snackbarHostState = remember { SnackbarHostState() }
-        LoginScreen(
-            scope = scope,
-            snackbarHostState = snackbarHostState,
-            userNameText = "",
-            passwordText = "",
-            navigateToHomeScreen = {},
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun LoginScreenPreview2() {
+//    ANDANDROIDTheme {
+//        val scope = rememberCoroutineScope()
+//        val snackbarHostState = remember { SnackbarHostState() }
+//        LoginScreen(
+//        )
+//    }
+//}

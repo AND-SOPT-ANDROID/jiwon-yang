@@ -1,4 +1,4 @@
-package org.sopt.and.model.dto.signup
+package org.sopt.and.data.dto.signup
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

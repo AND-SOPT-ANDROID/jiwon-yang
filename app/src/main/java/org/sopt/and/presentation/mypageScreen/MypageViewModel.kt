@@ -4,10 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.sopt.and.model.dto.login.ResponseGetUserSuccessDto
-import org.sopt.and.model.dto.mypage.RequestGetUserHobbyDto
-import org.sopt.and.model.dto.mypage.ResponseGetUserHobbyWrapperDto
-import org.sopt.and.model.network.ServicePool
+import org.sopt.and.data.dto.mypage.RequestGetUserHobbyDto
+import org.sopt.and.data.dto.mypage.ResponseGetUserHobbyWrapperDto
+import org.sopt.and.data.network.ServicePool
 import retrofit2.Callback
 
 import org.sopt.and.presentation.main.UserViewModel

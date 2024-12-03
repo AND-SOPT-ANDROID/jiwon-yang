@@ -1,13 +1,11 @@
-package org.sopt.and.model.network
+package org.sopt.and.data.network
 
-import org.sopt.and.model.dto.login.RequestGetUserDto
-import org.sopt.and.model.dto.login.ResponseGetUserFailDto
-import org.sopt.and.model.dto.login.ResponseGetUserSuccessDto
-import org.sopt.and.model.dto.login.ResponseGetUserWrapperDto
-import org.sopt.and.model.dto.mypage.RequestGetUserHobbyDto
-import org.sopt.and.model.dto.mypage.ResponseGetUserHobbyWrapperDto
-import org.sopt.and.model.dto.signup.RequestCreateUserDto
-import org.sopt.and.model.dto.signup.ResponseCreateUserSuccessDto
+import org.sopt.and.data.dto.login.RequestGetUserDto
+import org.sopt.and.data.dto.login.ResponseGetUserDto
+import org.sopt.and.data.dto.mypage.RequestGetUserHobbyDto
+import org.sopt.and.data.dto.mypage.ResponseGetUserHobbyWrapperDto
+import org.sopt.and.data.dto.signup.RequestCreateUserDto
+import org.sopt.and.data.dto.signup.ResponseCreateUserSuccessDto
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -27,7 +25,7 @@ interface UserService {
     @POST("/login")
     fun logInUser(
         @Body request: RequestGetUserDto
-    ): Call<ResponseGetUserWrapperDto>
+    ): Response<ResponseGetUserDto>
 
     @GET("/user/my-hobby")
     fun getMyHobby(

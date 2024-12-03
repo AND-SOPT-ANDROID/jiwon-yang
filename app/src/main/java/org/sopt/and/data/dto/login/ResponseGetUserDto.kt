@@ -1,10 +1,16 @@
-package org.sopt.and.model.dto.login
+package org.sopt.and.data.dto.login
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResponseGetUserSuccessDto(
+data class ResponseGetUserFailedDto(
+    @SerialName("code")
+    val code: String
+)
+
+@Serializable
+data class ResponseGetUserDto(
     @SerialName("result")
     val result: UserResult
 )

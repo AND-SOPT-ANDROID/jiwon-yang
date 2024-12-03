@@ -26,7 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.sopt.and.domain.User
-import org.sopt.and.model.dto.signup.RequestCreateUserDto
+import org.sopt.and.data.dto.signup.RequestCreateUserDto
 import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection

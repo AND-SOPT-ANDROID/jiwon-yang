@@ -17,15 +17,16 @@ import androidx.navigation.compose.rememberNavController
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import org.sopt.and.domain.User
+import org.sopt.and.data.datalocal.datasourceimpl.UserInfoLocalDataSourceImpl
 import org.sopt.and.presentation.loginScreen.LoginScreen
 import org.sopt.and.presentation.mypageScreen.MypageScreen
 import org.sopt.and.presentation.searchScreen.SearchScreen
 import org.sopt.and.presentation.signupScreen.SignUpScreen
 import org.sopt.and.presentation.homeScreen.HomeScreen
 import org.sopt.and.presentation.homeScreen.HomeViewModel
-import org.sopt.and.presentation.main.UserViewModel
+import org.sopt.and.presentation.loginScreen.LoginViewModel
 import org.sopt.and.presentation.mypageScreen.MypageViewModel
+import org.sopt.and.util.Route
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,63 +36,83 @@ class MainActivity : ComponentActivity() {
             ANDANDROIDTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     val navController = rememberNavController()
-                    val userViewModel: UserViewModel = viewModel()
-                    val mypageViewModel : MypageViewModel = viewModel()
+
+                    val context = navController.context
+                    val userInfoLocalDataSource = UserInfoLocalDataSourceImpl(context)
 
                     NavHost(
                         navController = navController,
-                        startDestination = SignUpScreen,
+                        startDestination = Route.SignUpScreen(userName = "", password = ""),
                         modifier = Modifier.padding(innerPadding)
                     ){
-                        composable<SignUpScreen> {
+                        composable<Route.SignUpScreen> { backStackEntry ->
+                            val item = backStackEntry.toRoute<Route.SignUpScreen>()
                             SignUpScreen(
-                                navigateToLoginScreen = { user ->
-                                    navController.navigate(LoginScreen(user.name, user.password)){
-                                        popUpTo(SignUpScreen) { inclusive = true }
+                                navigateToLoginScreen = {
+                                    navController.navigate(Route.LoginScreen){
+                                        popUpTo<Route.SignUpScreen> { inclusive = true }
                                         launchSingleTop = true
                                     }
                                 }
                             )
                         }
 
-                        composable<LoginScreen> { backStackEntry ->
-                            val item = backStackEntry.toRoute<LoginScreen>()
-                            val scope = rememberCoroutineScope()
-                            val snackbarHostState = remember { SnackbarHostState() }
+                        composable<Route.LoginScreen> { backStackEntry ->
+                            val item = backStackEntry.toRoute<Route.LoginScreen>()
                             LoginScreen(
-                                userNameText = item.userNameText,
-                                passwordText = item.passwordText,
-                                scope = scope,
-                                snackbarHostState = snackbarHostState,
+                                loginViewModel = LoginViewModel(userInfoLocalDataSource = userInfoLocalDataSource),
                                 navigateToHomeScreen = {
-                                    navController.navigate("home")
+                                    navController.navigate(Route.HomeScreen){
+                                        popUpTo<Route.HomeScreen> { inclusive = true}
+                                        launchSingleTop = true
+                                    }
                                 },
-                                userViewModel = userViewModel,
-                                mypageViewModel = mypageViewModel
                             )
                         }
 
-                        composable("home") {
+                        composable<Route.HomeScreen> { backStackEntry ->
+                            val item = backStackEntry.toRoute<Route.HomeScreen>()
                             HomeScreen(
+                                homeViewModel = HomeViewModel(),
                                 navController = navController,
-                                homeViewModel = HomeViewModel()
                             )
                         }
 
-                        composable("search") {
+                        composable<Route.SearchScreen> { backStackEntry ->
+                            val item = backStackEntry.toRoute<Route.SearchScreen>()
                             SearchScreen(
                                 navController = navController
                             )
                         }
 
-                        composable("profile") {
-
+                        composable<Route.MypageScreen> { backStackEntry ->
+                            val item = backStackEntry.toRoute<Route.MypageScreen>()
                             MypageScreen(
-                                navController = navController,
-                                userViewModel = userViewModel,
-                                mypageViewModel = mypageViewModel
+                                mypageViewModel = MypageViewModel(),
+                                navController = navController
                             )
                         }
+
+//                        composable("home") {
+//                            HomeScreen(
+//                                navController = navController,
+//                                homeViewModel = HomeViewModel()
+//                            )
+//                        }
+//
+//                        composable("search") {
+//                            SearchScreen(
+//                                navController = navController
+//                            )
+//                        }
+
+//                        composable("profile") {
+//
+//                            MypageScreen(
+//                                navController = navController,
+//                                mypageViewModel = mypageViewModel
+//                            )
+//                        }
 
                     }
                 }

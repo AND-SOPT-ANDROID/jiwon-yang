@@ -4,11 +4,16 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.sopt.and.model.dto.login.RequestGetUserDto
-import org.sopt.and.model.dto.login.ResponseGetUserWrapperDto
-import org.sopt.and.model.dto.mypage.RequestGetUserHobbyDto
-import org.sopt.and.model.dto.signup.RequestCreateUserDto
-import org.sopt.and.model.network.ServicePool
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.json.Json
+import org.sopt.and.data.datalocal.datasource.UserInfoLocalDataSource
+import org.sopt.and.domain.User
+import org.sopt.and.data.dto.login.RequestGetUserDto
+import org.sopt.and.data.dto.login.ResponseGetUserFailedDto
+import org.sopt.and.data.dto.mypage.RequestGetUserHobbyDto
+import org.sopt.and.data.dto.signup.RequestCreateUserDto
+import org.sopt.and.data.dto.signup.ResponseCreateUserFailedDto
+import org.sopt.and.data.network.ServicePool
 import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.presentation.mypageScreen.MypageViewModel
 import org.sopt.and.presentation.signupScreen.StringInputValidCheck
@@ -18,19 +23,18 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class LoginViewModel(
-    private val mypageViewModel: MypageViewModel
+    private val userInfoLocalDataSource: UserInfoLocalDataSource
 ) : ViewModel() {
 
     //로그인 요청을 서버로 보내기 위함
     private val userService by lazy { ServicePool.userService }
 
+    private val _user = MutableStateFlow(User())
+    val user: StateFlow<User> = _user
 
+    private val _loginResult = MutableStateFlow<Boolean?>(null)
+    val loginResult = _loginResult.asStateFlow()
 
-    private val _userNameState = MutableStateFlow("")
-    val userNameState: StateFlow<String> = _userNameState
-
-    private val _passwordState = MutableStateFlow("")
-    val passwordState: StateFlow<String> = _passwordState
 
     private val _isUserNameValid = MutableStateFlow(false)
     val isUserNameValid: StateFlow<Boolean> = _isUserNameValid
@@ -43,13 +47,13 @@ class LoginViewModel(
 
     //유저네임 입력 시 입력한 글자 표시
     fun onUserNameChange(newUserName: String) {
-        _userNameState.value = newUserName
+        _user.value = _user.value.copy(name = newUserName)
         _isUserNameValid.value = StringInputValidCheck(newUserName)
     }
 
     //비밀번호 입력 시 입력한 글자 표시
     fun onPasswordChange(newPassword: String) {
-        _passwordState.value = newPassword
+        _user.value = _user.value.copy(password = newPassword)
         _isPasswordValid.value = PasswordValidCheck(newPassword)
     }
 
@@ -58,46 +62,45 @@ class LoginViewModel(
         _shouldShowPassword.value = !_shouldShowPassword.value
     }
 
-    // 로그인 검증 로직
+    // 입력값이 조건에 맞는지 확인 (둘 다 여덟 자 이하?)
     fun isLoginValid(userNameText: String, passwordText: String): Boolean {
-        return _userNameState.value == userNameText && _passwordState.value == passwordText
+        return _isUserNameValid.value && _isPasswordValid.value
     }
 
-    fun logInUser(request: RequestGetUserDto, userViewModel: UserViewModel) {
-        val TAG = "UserService"
+    suspend fun logInUser() {
+        val requestDto = RequestGetUserDto(
+            userName = _user.value.name,
+            password = _user.value.password
+        )
 
-        userService.logInUser(request).enqueue(object : Callback<ResponseGetUserWrapperDto> {
-            override fun onResponse(
-                call: Call<ResponseGetUserWrapperDto>,
-                response: Response<ResponseGetUserWrapperDto>
-            ) {
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        val token = body.success.result.token
+        try {
+            val response = userService.logInUser(requestDto)
+            val token = response.body()?.result?.token
 
-                        Log.d(TAG, "유저 로그인 성공, 유저 토큰(id) : $token")
-                        userViewModel.setLoginToken(token)
-
-                        val requestGetUserHobbyDto = RequestGetUserHobbyDto(token = token)
-
-                        val userHobby = mypageViewModel.getUserHobby(requestGetUserHobbyDto, userViewModel)
-                        userViewModel.setHobby(userHobby.toString())
-
-                        /*TODO: 이때의 token을 기반으로 user data 받아와 loginViewModel에 값 업데이트 해주기*/
-
-
-                    } else {
-                        Log.e(TAG, "유저 로그인 실패")
-                    }
+            if(response.isSuccessful && token != null) {
+                userInfoLocalDataSource.accessToken = token
+                userInfoLocalDataSource.userName = _user.value.name
+                _loginResult.value = true
+                Log.d(
+                    "로그인 요청 성공",
+                    "Status code: ${response.code()} token: $token"
+                )
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("서버 응답", "Raw response body: $errorBody")
+                val errorCode = if (errorBody != null) {
+                    val errorData = Json.decodeFromString<ResponseGetUserFailedDto>(errorBody)
+                    errorData.code
                 } else {
-                    Log.e(TAG, "유저 로그인 에러 ${response.code()}")
+                    "Unknown error code"
                 }
+                Log.e("error", "Status code: ${response.code()} and error code: $errorCode")
+                _loginResult.value = false
             }
+        } catch (e: Exception) {
+            Log.e("error", "Exception: ${e.message}")
+            _loginResult.value = false
+        }
 
-            override fun onFailure(call: Call<ResponseGetUserWrapperDto>, t: Throwable) {
-                Log.e(TAG, "API 호출 도중 에러 발생: ${t.message}")
-            }
-        })
     }
 }

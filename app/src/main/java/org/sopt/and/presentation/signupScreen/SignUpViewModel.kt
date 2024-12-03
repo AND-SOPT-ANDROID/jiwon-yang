@@ -6,10 +6,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import org.sopt.and.domain.User
-import org.sopt.and.model.dto.signup.RequestCreateUserDto
-import org.sopt.and.model.dto.signup.ResponseCreateUserFailedDto
-import org.sopt.and.model.dto.signup.ResponseCreateUserSuccessDto
-import org.sopt.and.model.network.ServicePool
+import org.sopt.and.data.dto.signup.RequestCreateUserDto
+import org.sopt.and.data.dto.signup.ResponseCreateUserFailedDto
+import org.sopt.and.data.dto.signup.ResponseCreateUserSuccessDto
+import org.sopt.and.data.network.ServicePool
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -25,9 +25,6 @@ class SignUpViewModel : ViewModel() {
     private val _signUpResult = MutableStateFlow<Result<Unit>?>(null)
     val signUpResult: StateFlow<Result<Unit>?> = _signUpResult
 
-//    val userNameText = _user.value.name
-//    val userPasswordText = _user.value.password
-//    val userHobbyText = _user.value.hobby
 
     private val _isUserNameValid = MutableStateFlow(true)
     val isUserNameValid: StateFlow<Boolean> = _isUserNameValid

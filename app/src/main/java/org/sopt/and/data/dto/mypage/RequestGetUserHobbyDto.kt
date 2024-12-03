@@ -1,4 +1,4 @@
-package org.sopt.and.model.dto.mypage
+package org.sopt.and.data.dto.mypage
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

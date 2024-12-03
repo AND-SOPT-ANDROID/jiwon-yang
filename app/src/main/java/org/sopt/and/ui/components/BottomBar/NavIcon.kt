@@ -16,6 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.sopt.and.R
+import org.sopt.and.presentation.homeScreen.HomeScreen
+import org.sopt.and.presentation.homeScreen.HomeViewModel
+import org.sopt.and.presentation.mypageScreen.MypageScreen
+import org.sopt.and.presentation.mypageScreen.MypageViewModel
+import org.sopt.and.presentation.searchScreen.SearchScreen
+import org.sopt.and.util.Route
 
 @Composable
 fun NavIcon(
@@ -26,7 +32,19 @@ fun NavIcon(
     text: String
 ){
     Column(
-        modifier = modifier.clickable {navController.navigate(route)},
+        modifier = modifier.clickable {
+            when (route) {
+                "home" -> {
+                    navController.navigate(Route.HomeScreen)
+                }
+                "search" -> {
+                    navController.navigate(Route.SearchScreen)
+                }
+                "profile" -> {
+                    navController.navigate(Route.MypageScreen(userName = "")) /*username을 여기다 어떻게 넣어주지?*/
+                }
+            }
+        },
         horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
     ){
         if(text != "MY"){

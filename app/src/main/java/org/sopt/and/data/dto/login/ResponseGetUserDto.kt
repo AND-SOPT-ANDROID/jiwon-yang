@@ -13,10 +13,10 @@ data class ResponseGetUserFailedDto(
 data class ResponseGetUserDto(
     @SerialName("result")
     val result: UserResult
-)
-
-@Serializable
-data class UserResult(
-    @SerialName("token")
-    val token: String
-)
+){
+    @Serializable
+    data class UserResult(
+        @SerialName("token")
+        val token: String
+    )
+}

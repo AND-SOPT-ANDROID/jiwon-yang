@@ -23,14 +23,14 @@ interface UserService {
     ): Response<ResponseCreateUserSuccessDto>
 
     @POST("/login")
-    fun logInUser(
+    suspend fun logInUser(
         @Body request: RequestGetUserDto
     ): Response<ResponseGetUserDto>
 
     @GET("/user/my-hobby")
-    fun getMyHobby(
+    suspend fun getMyHobby(
         @Header("token") request: RequestGetUserHobbyDto
-    ): Call<ResponseGetUserHobbyWrapperDto>
+    ): Response<ResponseGetUserHobbyWrapperDto>
 
 
 

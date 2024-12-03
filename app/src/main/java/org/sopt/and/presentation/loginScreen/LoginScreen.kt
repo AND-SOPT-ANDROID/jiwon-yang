@@ -97,8 +97,9 @@ fun LoginScreen(
             // UserName 입력 필드
             SignUpTextField(
                 text = userNameText.value,
-                onValueChange = { newValue ->
-                    loginViewModel.onUserNameChange(newValue)
+                onValueChange = {
+                    userNameText.value = it
+                    loginViewModel.onUserNameChange(it)
                     isUserNameValid = StringInputValidCheck(userNameText.value)
                 },
                 fieldType = "UserName",
@@ -112,8 +113,9 @@ fun LoginScreen(
             // Password 입력 필드
             SignUpTextField(
                 text = passwordText.value,
-                onValueChange = { newValue ->
-                    loginViewModel.onPasswordChange(newValue)
+                onValueChange = {
+                    passwordText.value = it
+                    loginViewModel.onPasswordChange(it)
                     isPasswordValid = PasswordValidCheck(passwordText.value)
                 },
                 fieldType = "Password",
@@ -138,14 +140,10 @@ fun LoginScreen(
                         loginMessage = "로그인 성공"
                         loginSuccessFlag = 1
 
-                        //입력받은 유저네임과 패스워드를 보내기
                         coroutineScope.launch {
                             loginViewModel.logInUser()
                         }
 
-
-                        //로그인 성공 시, token 값을 저장해 줌
-//                        loginViewModel.logInUser(loginedUser, userViewModel)
 
                         /*TODO: 백엔드 연결 후 해당 코드 삭제*/
 //                        userViewModel.setUserName(userNameText)

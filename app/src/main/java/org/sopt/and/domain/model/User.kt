@@ -1,4 +1,4 @@
-package org.sopt.and.domain
+package org.sopt.and.domain.model
 
 data class User(
     var name: String = "",

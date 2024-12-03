@@ -1,5 +1,6 @@
 package org.sopt.and
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +13,8 @@ import androidx.navigation.compose.rememberNavController
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import org.sopt.and.data.datalocal.datasourceimpl.UserInfoLocalDataSourceImpl
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 import org.sopt.and.presentation.loginScreen.LoginScreen
 import org.sopt.and.presentation.mypageScreen.MypageScreen
 import org.sopt.and.presentation.searchScreen.SearchScreen
@@ -23,6 +25,7 @@ import org.sopt.and.presentation.loginScreen.LoginViewModel
 import org.sopt.and.presentation.mypageScreen.MypageViewModel
 import org.sopt.and.util.Route
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +38,6 @@ class MainActivity : ComponentActivity() {
                         val navController = rememberNavController()
 
                         val context = navController.context
-                        val userInfoLocalDataSource = UserInfoLocalDataSourceImpl(context)
 
                         NavHost(
                             navController = navController,
@@ -57,7 +59,6 @@ class MainActivity : ComponentActivity() {
                             composable<Route.LoginScreen> { backStackEntry ->
                                 val item = backStackEntry.toRoute<Route.LoginScreen>()
                                 LoginScreen(
-                                    loginViewModel = LoginViewModel(userInfoLocalDataSource = userInfoLocalDataSource),
                                     navigateToHomeScreen = {
                                         navController.navigate(Route.HomeScreen){
                                             popUpTo<Route.HomeScreen> { inclusive = true}
@@ -85,7 +86,6 @@ class MainActivity : ComponentActivity() {
                             composable<Route.MypageScreen> { backStackEntry ->
                                 val item = backStackEntry.toRoute<Route.MypageScreen>()
                                 MypageScreen(
-                                    mypageViewModel = MypageViewModel(userInfoLocalDataSource = userInfoLocalDataSource),
                                     navController = navController
                                 )
                             }
@@ -97,3 +97,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+

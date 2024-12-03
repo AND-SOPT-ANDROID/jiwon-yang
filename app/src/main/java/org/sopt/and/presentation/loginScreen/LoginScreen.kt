@@ -16,7 +16,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,24 +26,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.CoroutineScope
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.sopt.and.presentation.signupScreen.StringInputValidCheck
 import org.sopt.and.presentation.signupScreen.PasswordValidCheck
 import org.sopt.and.R
-import org.sopt.and.data.dto.login.RequestGetUserDto
-import org.sopt.and.data.dto.signup.RequestCreateUserDto
-import org.sopt.and.presentation.main.UserViewModel
-import org.sopt.and.presentation.mypageScreen.MypageViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
-import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 
 @Serializable
@@ -57,7 +49,7 @@ data class LoginScreen(
 fun LoginScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
     navigateToHomeScreen: () -> Unit,
-    loginViewModel: LoginViewModel,
+    loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
 
     var userNameText = remember { mutableStateOf("") }

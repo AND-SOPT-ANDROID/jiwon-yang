@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -27,7 +28,7 @@ import org.sopt.and.ui.theme.ANDANDROIDTheme
 @Composable
 fun MypageScreen(
     navController: NavController,
-    mypageViewModel: MypageViewModel = viewModel()
+    mypageViewModel: MypageViewModel = hiltViewModel()
 ) {
     val user by mypageViewModel.user.collectAsState()
 

@@ -1,4 +1,4 @@
-package org.sopt.and.data.dto.mypage
+package org.sopt.and.data.dataremote.model.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -2,27 +2,29 @@ package org.sopt.and.presentation.loginScreen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.Json
 import org.sopt.and.data.datalocal.datasource.UserInfoLocalDataSource
-import org.sopt.and.domain.User
-import org.sopt.and.data.dto.login.RequestGetUserDto
-import org.sopt.and.data.dto.login.ResponseGetUserFailedDto
-import org.sopt.and.data.dto.signup.RequestCreateUserDto
-import org.sopt.and.data.dto.signup.ResponseCreateUserFailedDto
-import org.sopt.and.data.network.ServicePool
-import org.sopt.and.presentation.main.UserViewModel
-import org.sopt.and.presentation.mypageScreen.MypageViewModel
+import org.sopt.and.domain.model.User
+import org.sopt.and.data.dataremote.model.request.RequestGetUserDto
+import org.sopt.and.data.dataremote.model.response.ResponseGetUserFailedDto
+import org.sopt.and.data.dataremote.network.ServicePool
+import org.sopt.and.domain.usecase.PostLoginUseCase
+import org.sopt.and.domain.usecase.SaveAccessTokenUseCase
+import org.sopt.and.domain.usecase.SaveUserNameUseCase
 import org.sopt.and.presentation.signupScreen.StringInputValidCheck
 import org.sopt.and.presentation.signupScreen.PasswordValidCheck
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import javax.inject.Inject
 
-class LoginViewModel(
-    private val userInfoLocalDataSource: UserInfoLocalDataSource
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val userInfoLocalDataSource: UserInfoLocalDataSource,
+    private val postLoginUseCase: PostLoginUseCase,
+    private val saveUserNameUseCase: SaveUserNameUseCase,
+    private val saveAccessTokenUseCase: SaveAccessTokenUseCase
 ) : ViewModel() {
 
     //로그인 요청을 서버로 보내기 위함
@@ -72,12 +74,12 @@ class LoginViewModel(
         )
 
         try {
-            val response = userService.logInUser(requestDto)
+            val response = postLoginUseCase(requestDto)
             val token = response.body()?.result?.token
 
             if(response.isSuccessful && token != null) {
-                userInfoLocalDataSource.accessToken = token
-                userInfoLocalDataSource.userName = _user.value.name
+                saveUserNameUseCase(_user.value.name)
+                saveAccessTokenUseCase(token)
                 _loginResult.value = true
                 Log.d(
                     "로그인 요청 성공",

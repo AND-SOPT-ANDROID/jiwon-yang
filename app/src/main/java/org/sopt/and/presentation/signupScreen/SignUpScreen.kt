@@ -22,19 +22,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import org.sopt.and.domain.User
-import org.sopt.and.data.dto.signup.RequestCreateUserDto
-import org.sopt.and.presentation.main.UserViewModel
+import org.sopt.and.domain.model.User
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
-import kotlin.math.sign
-
-@Serializable
-data object SignUpScreen
 
 fun StringInputValidCheck(newString: String): Boolean {
     var isValid = false
@@ -57,7 +52,7 @@ fun PasswordValidCheck(password: String): Boolean {
 fun SignUpScreen(
     modifier: Modifier = Modifier,
     navigateToLoginScreen: (user: User) -> Unit = {},
-    signUpViewModel: SignUpViewModel = viewModel()
+    signUpViewModel: SignUpViewModel = hiltViewModel()
 ) {
 
     val context = LocalContext.current

@@ -2,21 +2,22 @@ package org.sopt.and.presentation.signupScreen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
-import org.sopt.and.domain.User
-import org.sopt.and.data.dto.signup.RequestCreateUserDto
-import org.sopt.and.data.dto.signup.ResponseCreateUserFailedDto
-import org.sopt.and.data.dto.signup.ResponseCreateUserSuccessDto
-import org.sopt.and.data.network.ServicePool
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import org.sopt.and.domain.model.User
+import org.sopt.and.data.dataremote.model.request.RequestCreateUserDto
+import org.sopt.and.data.dataremote.model.response.ResponseCreateUserFailedDto
+import org.sopt.and.data.dataremote.network.ServicePool
+import org.sopt.and.domain.usecase.PostSignUpUseCase
+import javax.inject.Inject
 
-class SignUpViewModel : ViewModel() {
+@HiltViewModel
+class SignUpViewModel @Inject constructor(
+    private val postSignUpUseCase: PostSignUpUseCase
+) : ViewModel() {
 
-    //회원가입 성공 시 서버로 create 요청 보내기 위함
     private val userService by lazy { ServicePool.userService }
 
     private val _user = MutableStateFlow(User())
@@ -74,7 +75,7 @@ class SignUpViewModel : ViewModel() {
         )
 
         try {
-            val response = userService.signUpUser(requestDto)
+            val response = postSignUpUseCase(requestDto)
             if(response.isSuccessful) {
                 _signUpResult.value = Result.success(Unit)
                 Log.d("로그인 성공", "Status code: ${response.code()}")

@@ -1,6 +1,5 @@
-package org.sopt.and
+package org.sopt.and.presentation.loginScreen
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,20 +19,29 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import org.sopt.and.presentation.signupScreen.StringInputValidCheck
+import org.sopt.and.presentation.signupScreen.PasswordValidCheck
+import org.sopt.and.R
+import org.sopt.and.data.dto.login.RequestGetUserDto
+import org.sopt.and.data.dto.signup.RequestCreateUserDto
+import org.sopt.and.presentation.main.UserViewModel
+import org.sopt.and.presentation.mypageScreen.MypageViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
@@ -41,36 +49,32 @@ import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Serializable
 data class LoginScreen(
-    val emailText: String,
+    val userNameText: String,
     val passwordText: String
 )
 
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier.fillMaxSize(),
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
-    emailText: String,
-    passwordText: String,
     navigateToHomeScreen: () -> Unit,
-    userViewModel: UserViewModel = viewModel()
+    loginViewModel: LoginViewModel,
 ) {
 
-    var inputEmail: String = ""
-    var inputPassword: String = ""
+    var userNameText = remember { mutableStateOf("") }
+    var passwordText = remember { mutableStateOf("") }
 
-    var emailState = remember { mutableStateOf(inputEmail) }
-    var passwordState = remember { mutableStateOf(inputPassword) }
+    var isUserNameValid = loginViewModel.isUserNameValid.collectAsState().value
+    var isPasswordValid = loginViewModel.isPasswordValid.collectAsState().value
+    var shouldShowPassword = loginViewModel.shouldShowPassword.collectAsState().value
+    val loginResult = loginViewModel.loginResult.collectAsState().value
 
-    var isEmailValid = remember { mutableStateOf(true) }
-    var isPasswordValid = remember { mutableStateOf(true) }
-
-    var shouldShowPassword = remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val snackBarHostState = remember {SnackbarHostState()}
 
     Scaffold(
         modifier = modifier,
         snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
+            SnackbarHost(hostState = snackBarHostState)
         }
     ) { innerPadding ->
         Column(
@@ -92,35 +96,37 @@ fun LoginScreen(
                 )
             }
 
-            // Email 입력 필드
+            // UserName 입력 필드
             SignUpTextField(
-                text = emailState.value,
-                onValueChange = { newValue ->
-                    emailState.value = newValue
-                    isEmailValid.value = EmailValidCheck(emailState.value)
+                text = userNameText.value,
+                onValueChange = {
+                    userNameText.value = it
+                    loginViewModel.onUserNameChange(it)
+                    isUserNameValid = StringInputValidCheck(userNameText.value)
                 },
-                fieldType = "Email",
-                conditionCheck = isEmailValid.value,
-                errMessage = "올바른 이메일 형식이 아닙니다.",
-                placeholder = "wavve@example.com",
+                fieldType = "UserName",
+                conditionCheck = isUserNameValid,
+                errMessage = "유저 이름은 7자 이하여야 합니다.",
+                placeholder = "유저 이름 (7자 이하)",
             )
 
             Spacer(modifier = Modifier.weight(0.025f))
 
             // Password 입력 필드
             SignUpTextField(
-                text = passwordState.value,
-                onValueChange = { newValue ->
-                    passwordState.value = newValue
-                    isPasswordValid.value = PasswordValidCheck(passwordState.value)
+                text = passwordText.value,
+                onValueChange = {
+                    passwordText.value = it
+                    loginViewModel.onPasswordChange(it)
+                    isPasswordValid = PasswordValidCheck(passwordText.value)
                 },
                 fieldType = "Password",
-                conditionCheck = isPasswordValid.value,
+                conditionCheck = isPasswordValid,
                 errMessage = "올바른 비밀번호 형식이 아닙니다.",
                 placeholder = "Wavve 비밀번호 설정",
-                shouldShowPassword = shouldShowPassword.value,
+                shouldShowPassword = shouldShowPassword,
                 onPasswordVisibilityChange = {
-                    shouldShowPassword.value = !shouldShowPassword.value
+                    loginViewModel.togglePasswordVisibility()
                 },
             )
 
@@ -129,22 +135,10 @@ fun LoginScreen(
             // 로그인 버튼
             Button(
                 onClick = {
-                    var loginMessage = ""
-                    var loginSuccessFlag = 0
-
-                    if (emailState.value == emailText && passwordState.value == passwordText) {
-                        loginMessage = "로그인 성공"
-                        loginSuccessFlag = 1
-                    } else {
-                        loginMessage = "알맞은 이메일과 비밀번호를 입력하세요"
-                    }
-
-                    scope.launch {
-                        val snackbarResult = snackbarHostState.showSnackbar(loginMessage)
-
-                        if (loginSuccessFlag == 1 && snackbarResult == SnackbarResult.Dismissed) {
-                            userViewModel.setEmail(emailState.value)
-                            navigateToHomeScreen()
+                    // 일단 글자 조건(8자)에 맞으면 logInUser API를 불러 봄
+                    if (loginViewModel.isLoginValid(userNameText.value, passwordText.value)) {
+                        coroutineScope.launch {
+                            loginViewModel.logInUser()
                         }
                     }
                 },
@@ -173,23 +167,29 @@ fun LoginScreen(
             SocialLoginSection(modifier = modifier)
             Spacer(modifier = Modifier.weight(1f))
         }
+        LaunchedEffect(loginResult){
+            loginResult?.let {
+                if (loginResult == true) {
+                    snackBarHostState.showSnackbar(message = "로그인에 성공했습니다.")
+                    delay(300)
+                    navigateToHomeScreen()
+                } else {
+                    snackBarHostState.showSnackbar(message = "유저 이름 혹은 비밀번호를 확인하세요.")
+                }
+            }
+        }
     }
 }
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview2() {
-    ANDANDROIDTheme {
-        val scope = rememberCoroutineScope()
-        val snackbarHostState = remember { SnackbarHostState() }
-        LoginScreen(
-            scope = scope,
-            snackbarHostState = snackbarHostState,
-            emailText = "",
-            passwordText = "",
-            navigateToHomeScreen = {},
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun LoginScreenPreview2() {
+//    ANDANDROIDTheme {
+//        val scope = rememberCoroutineScope()
+//        val snackbarHostState = remember { SnackbarHostState() }
+//        LoginScreen(
+//        )
+//    }
+//}

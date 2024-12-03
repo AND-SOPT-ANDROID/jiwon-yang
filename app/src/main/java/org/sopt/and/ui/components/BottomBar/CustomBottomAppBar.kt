@@ -18,7 +18,6 @@ fun CustomBottomAppBar(navController: NavController) {
     BottomAppBar(
         containerColor = Color.Black,
         contentColor = Color.White,
-
         ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

@@ -1,4 +1,4 @@
-package org.sopt.and
+package org.sopt.and.presentation.searchScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize

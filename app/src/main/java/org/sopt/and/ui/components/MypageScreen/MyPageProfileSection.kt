@@ -27,9 +27,9 @@ import org.sopt.and.R
 
 @Composable
 fun MyPageProfileSection(
-    deliveredEmail: String,
+    deliveredUserName: String,
+    deliveredUserHobby: String?,
 ){
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -52,7 +52,7 @@ fun MyPageProfileSection(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                "${deliveredEmail}님",
+                "${deliveredUserHobby}를 즐기는\n${deliveredUserName}님",
                 color = Color.White
             )
             Spacer(modifier = Modifier.weight(0.5f))

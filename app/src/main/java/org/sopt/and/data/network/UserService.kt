@@ -2,8 +2,7 @@ package org.sopt.and.data.network
 
 import org.sopt.and.data.dto.login.RequestGetUserDto
 import org.sopt.and.data.dto.login.ResponseGetUserDto
-import org.sopt.and.data.dto.mypage.RequestGetUserHobbyDto
-import org.sopt.and.data.dto.mypage.ResponseGetUserHobbyWrapperDto
+import org.sopt.and.data.dto.mypage.ResponseGetUserHobbyDto
 import org.sopt.and.data.dto.signup.RequestCreateUserDto
 import org.sopt.and.data.dto.signup.ResponseCreateUserSuccessDto
 import retrofit2.Call
@@ -29,8 +28,8 @@ interface UserService {
 
     @GET("/user/my-hobby")
     suspend fun getMyHobby(
-        @Header("token") request: RequestGetUserHobbyDto
-    ): Response<ResponseGetUserHobbyWrapperDto>
+        @Header("token") token: String
+    ): Response<ResponseGetUserHobbyDto>
 
 
 

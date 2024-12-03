@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -30,12 +31,10 @@ import org.sopt.and.presentation.main.UserViewModel
 @Composable
 fun MypageScreen(
     navController: NavController,
-    userViewModel: UserViewModel = viewModel(),
     mypageViewModel: MypageViewModel = viewModel()
 ) {
 
-    var userNameText = userViewModel.userName.collectAsState().value
-    val userHobby = userViewModel.hobby.collectAsState().value
+    val user by mypageViewModel.user.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -49,8 +48,8 @@ fun MypageScreen(
                 .padding(innerPadding)
         ) {
             MyPageProfileSection(
-                deliveredUserName = userNameText,
-                deliveredUserHobby = userHobby
+                deliveredUserName = user.name,
+                deliveredUserHobby = user.hobby
             )
             Spacer(modifier = Modifier.height(0.5.dp))
             MyPageProfileSection2(

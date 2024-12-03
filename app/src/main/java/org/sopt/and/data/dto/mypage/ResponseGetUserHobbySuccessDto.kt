@@ -4,13 +4,20 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResponseGetUserHobbySuccessDto(
-    @SerialName("result")
-    val result: HobbyResult? = null,
+data class ResponseGetUserHobbyFailDto(
+    @SerialName("code")
+    val no: Int
 )
 
 @Serializable
-data class HobbyResult(
-    @SerialName("hobby")
-    val userHobby: String? = null,
-)
+data class ResponseGetUserHobbyDto(
+    @SerialName("result")
+    val result: Result?= null,
+){
+    @Serializable
+    data class Result(
+        @SerialName("hobby")
+        val userHobby: String? = null,
+    )
+}
+

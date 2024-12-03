@@ -10,7 +10,6 @@ import org.sopt.and.data.datalocal.datasource.UserInfoLocalDataSource
 import org.sopt.and.domain.User
 import org.sopt.and.data.dto.login.RequestGetUserDto
 import org.sopt.and.data.dto.login.ResponseGetUserFailedDto
-import org.sopt.and.data.dto.mypage.RequestGetUserHobbyDto
 import org.sopt.and.data.dto.signup.RequestCreateUserDto
 import org.sopt.and.data.dto.signup.ResponseCreateUserFailedDto
 import org.sopt.and.data.network.ServicePool

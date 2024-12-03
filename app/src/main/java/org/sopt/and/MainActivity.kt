@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
                         composable<Route.MypageScreen> { backStackEntry ->
                             val item = backStackEntry.toRoute<Route.MypageScreen>()
                             MypageScreen(
-                                mypageViewModel = MypageViewModel(),
+                                mypageViewModel = MypageViewModel(userInfoLocalDataSource = userInfoLocalDataSource),
                                 navController = navController
                             )
                         }

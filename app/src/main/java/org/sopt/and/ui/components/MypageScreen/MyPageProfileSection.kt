@@ -30,10 +30,6 @@ fun MyPageProfileSection(
     deliveredUserName: String,
     deliveredUserHobby: String?,
 ){
-
-    //임시 값 삽입
-    val hobby = deliveredUserHobby ?: "eating"
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,7 +52,7 @@ fun MyPageProfileSection(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                "요즘 ${hobby}를 즐기는\n${deliveredUserName}님",
+                "${deliveredUserHobby}를 즐기는\n${deliveredUserName}님",
                 color = Color.White
             )
             Spacer(modifier = Modifier.weight(0.5f))

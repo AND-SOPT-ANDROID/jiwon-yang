@@ -8,7 +8,6 @@ import org.sopt.and.model.dto.login.RequestGetUserDto
 import org.sopt.and.model.dto.login.ResponseGetUserWrapperDto
 import org.sopt.and.model.dto.mypage.RequestGetUserHobbyDto
 import org.sopt.and.model.dto.signup.RequestCreateUserDto
-import org.sopt.and.model.dto.signup.ResponseCreateUserWrapperDto
 import org.sopt.and.model.network.ServicePool
 import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.presentation.mypageScreen.MypageViewModel

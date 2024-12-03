@@ -8,8 +8,8 @@ import org.sopt.and.model.dto.mypage.RequestGetUserHobbyDto
 import org.sopt.and.model.dto.mypage.ResponseGetUserHobbyWrapperDto
 import org.sopt.and.model.dto.signup.RequestCreateUserDto
 import org.sopt.and.model.dto.signup.ResponseCreateUserSuccessDto
-import org.sopt.and.model.dto.signup.ResponseCreateUserWrapperDto
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -20,9 +20,9 @@ import retrofit2.http.POST
 interface UserService {
 
     @POST("/user")
-    fun signUpUser(
-        @Body request: RequestCreateUserDto
-    ): Call<ResponseCreateUserWrapperDto>   //Call : 돌아오는 응답의 타입
+    suspend fun signUpUser(
+        @Body requestDto: RequestCreateUserDto
+    ): Response<ResponseCreateUserSuccessDto>
 
     @POST("/login")
     fun logInUser(

@@ -17,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import org.sopt.and.domain.User
 import org.sopt.and.presentation.loginScreen.LoginScreen
 import org.sopt.and.presentation.mypageScreen.MypageScreen
 import org.sopt.and.presentation.searchScreen.SearchScreen
@@ -44,8 +45,8 @@ class MainActivity : ComponentActivity() {
                     ){
                         composable<SignUpScreen> {
                             SignUpScreen(
-                                navigateToLoginScreen = { userNameText, passwordText ->
-                                    navController.navigate(LoginScreen(userNameText, passwordText))
+                                navigateToLoginScreen = { user ->
+                                    User(user.name, user.password)
                                 }
                             )
                         }

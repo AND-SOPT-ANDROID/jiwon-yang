@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -20,12 +23,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import org.sopt.and.domain.User
 import org.sopt.and.model.dto.signup.RequestCreateUserDto
 import org.sopt.and.presentation.main.UserViewModel
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
+import kotlin.math.sign
 
 @Serializable
 data object SignUpScreen
@@ -42,28 +48,31 @@ fun StringInputValidCheck(newString: String): Boolean {
 }
 
 fun PasswordValidCheck(password: String): Boolean {
-    val pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*])|(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*])|(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\$%^&*]).{8,20}\$".toRegex()
+    val pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*])|(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*])|(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\$%^&*]).{1,8}\$".toRegex()
     return password.matches(pattern)
-
 }
+
 
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    navigateToLoginScreen: (userNameText: String, passwordText: String) -> Unit,
+    navigateToLoginScreen: (user: User) -> Unit = {},
     signUpViewModel: SignUpViewModel = viewModel()
 ) {
 
     val context = LocalContext.current
     var toastMessage = ""
 
-    var userNameText = signUpViewModel.userNameText.collectAsState().value
-    var passwordText = signUpViewModel.passwordText.collectAsState().value
-    var hobbyText = signUpViewModel.hobbyText.collectAsState().value
+    var userNameText = remember { mutableStateOf("") }
+    var passwordText = remember { mutableStateOf("") }
+    var hobbyText = remember { mutableStateOf("") }
+
     var isUserNameValid = signUpViewModel.isUserNameValid.collectAsState().value
     var isPasswordValid = signUpViewModel.isPasswordValid.collectAsState().value
     var isHobbyValid = signUpViewModel.isHobbyValid.collectAsState().value
     var shouldShowPassword = signUpViewModel.shouldShowPassword.collectAsState().value
+
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -91,10 +100,11 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.weight(0.25f))
 
         SignUpTextField(
-            text = userNameText,
-            onValueChange = { newValue ->
-                signUpViewModel.onUserNameChange(newValue)
-                isUserNameValid = StringInputValidCheck(userNameText)
+            text = userNameText.value,
+            onValueChange = {
+                userNameText.value = it
+                signUpViewModel.onUserNameChange(it)
+                isUserNameValid = StringInputValidCheck(it)
             },
             fieldType = "userName",
             conditionCheck = isUserNameValid,
@@ -106,10 +116,11 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.weight(0.15f))
 
         SignUpTextField(
-            text = passwordText,
-            onValueChange = { newValue ->
-                signUpViewModel.onPasswordChange(newValue)
-                isPasswordValid = PasswordValidCheck(passwordText)
+            text = passwordText.value,
+            onValueChange = {
+                passwordText.value = it
+                signUpViewModel.onPasswordChange(it) /*todo: onpasswordchange 안에 isvalid 체킹하는 로직을 넣기.*/
+                isPasswordValid = PasswordValidCheck(it)
             },
             fieldType = "Password",
             conditionCheck = isPasswordValid,
@@ -123,10 +134,11 @@ fun SignUpScreen(
         )
 
         SignUpTextField(
-            text = hobbyText,
-            onValueChange = { newValue ->
-                signUpViewModel.onHobbyChange(newValue)
-                isHobbyValid = StringInputValidCheck(hobbyText)
+            text = hobbyText.value,
+            onValueChange = {
+                hobbyText.value = it
+                signUpViewModel.onHobbyChange(it)
+                isHobbyValid = StringInputValidCheck(it)
             },
             fieldType = "hobby",
             conditionCheck = isHobbyValid,
@@ -147,30 +159,27 @@ fun SignUpScreen(
                 .padding(vertical = 13.dp)
                 .clickable {
 
+                    /*Todo: 클릭 시 조건 검사 및 토스트 띄우는 것까지 createNewUser 안에 넣기*/
+
                     //유저 네임 형식 조건 검사
-                    if (!StringInputValidCheck(userNameText)) {
+                    if (!StringInputValidCheck(userNameText.value)) {
                         toastMessage = "형식에 맞는 유저 네임을 입력하세요"
 
                     }
-
                     //비밀번호 형식 조건 검사
-                    if (!PasswordValidCheck(passwordText)) {
+                    if (!PasswordValidCheck(passwordText.value)) {
                         toastMessage = "조건에 맞는 비밀번호를 사용하세요"
                     }
 
                     if (signUpViewModel.isSignUpValid()) {
 
-                        /* 새로 회원가입한 정보 저장 */
-                        val newUser = RequestCreateUserDto(
-                            userName = userNameText,
-                            password = passwordText,
-                            hobby = hobbyText
-                        )
-                        signUpViewModel.createNewUser(newUser)
+                        coroutineScope.launch {
+                            signUpViewModel.createNewUser()
+                        }
 
                         toastMessage = "회원가입에 성공하였습니다."
 
-                        navigateToLoginScreen(userNameText, passwordText)
+                        navigateToLoginScreen(User(userNameText.value, passwordText.value))
                     }
 
                     Toast
@@ -190,10 +199,6 @@ fun SignUpScreen(
 fun SignUpPreview() {
     ANDANDROIDTheme {
         SignUpScreen(
-            navigateToLoginScreen = {
-                userName, password ->
-                println("userName: $userName, password: $password")
-            }
         )
     }
 }

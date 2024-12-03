@@ -4,8 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.json.Json
+import org.sopt.and.domain.User
 import org.sopt.and.model.dto.signup.RequestCreateUserDto
-import org.sopt.and.model.dto.signup.ResponseCreateUserWrapperDto
+import org.sopt.and.model.dto.signup.ResponseCreateUserFailedDto
+import org.sopt.and.model.dto.signup.ResponseCreateUserSuccessDto
 import org.sopt.and.model.network.ServicePool
 import retrofit2.Call
 import retrofit2.Callback
@@ -16,14 +19,15 @@ class SignUpViewModel : ViewModel() {
     //회원가입 성공 시 서버로 create 요청 보내기 위함
     private val userService by lazy { ServicePool.userService }
 
-    private val _userNameText = MutableStateFlow("")
-    val userNameText: StateFlow<String> = _userNameText
+    private val _user = MutableStateFlow(User())
+    val user: StateFlow<User> = _user
 
-    private val _passwordText = MutableStateFlow("")
-    val passwordText: StateFlow<String> = _passwordText
+    private val _signUpResult = MutableStateFlow<Result<Unit>?>(null)
+    val signUpResult: StateFlow<Result<Unit>?> = _signUpResult
 
-    private val _hobbyText = MutableStateFlow("")
-    val hobbyText: StateFlow<String> = _hobbyText
+//    val userNameText = _user.value.name
+//    val userPasswordText = _user.value.password
+//    val userHobbyText = _user.value.hobby
 
     private val _isUserNameValid = MutableStateFlow(true)
     val isUserNameValid: StateFlow<Boolean> = _isUserNameValid
@@ -40,19 +44,19 @@ class SignUpViewModel : ViewModel() {
 
     // 유저 네임 입력 시 입력한 값 보이기
     fun onUserNameChange(newUserName: String) {
-        _userNameText.value = newUserName
+        _user.value = _user.value.copy(name = newUserName)
         _isUserNameValid.value = StringInputValidCheck(newUserName)
     }
 
     // 비밀번호 입력 시 입력한 값 보이기
     fun onPasswordChange(newPassword: String) {
-        _passwordText.value = newPassword
+        _user.value = _user.value.copy(password = newPassword)
         _isPasswordValid.value = PasswordValidCheck(newPassword)
     }
 
-    // 비밀번호 입력 시 입력한 값 보이기
+    // 취미 입력 시 입력한 값 보이기
     fun onHobbyChange(newHobby: String) {
-        _hobbyText.value = newHobby
+        _user.value = _user.value.copy(hobby = newHobby)
         _isHobbyValid.value = StringInputValidCheck(newHobby)
     }
 
@@ -65,34 +69,34 @@ class SignUpViewModel : ViewModel() {
         return _isUserNameValid.value && _isPasswordValid.value
     }
 
-    fun createNewUser(request: RequestCreateUserDto) {
-        val TAG = "UserService"
+    suspend fun createNewUser() {
+        val requestDto = RequestCreateUserDto(
+            userName = _user.value.name,
+            password = _user.value.password,
+            hobby = _user.value.hobby
+        )
 
-        userService.signUpUser(request).enqueue(object : Callback<ResponseCreateUserWrapperDto> {
-
-            override fun onResponse(
-                call: Call<ResponseCreateUserWrapperDto>,
-                response: Response<ResponseCreateUserWrapperDto>
-            ) {
-                if (response.isSuccessful) {
-                    val body = response.body()
-                    if (body != null) {
-                        Log.d(TAG, "유저 생성 성공 ${body.success.result.no}")
-                    } else {
-                        Log.e(TAG, "유저 생성 에러")
-                    }
+        try {
+            val response = userService.signUpUser(requestDto)
+            if(response.isSuccessful) {
+                _signUpResult.value = Result.success(Unit)
+                Log.d("로그인 성공", "Status code: ${response.code()}")
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Log.e("서버 응답", "Raw response body: $errorBody")
+                val errorCode = if (errorBody != null){
+                    val errorData = Json.decodeFromString<ResponseCreateUserFailedDto>(errorBody)
+                    errorData.code
                 } else {
-                    Log.e(TAG, "유저 생성 에러 ${response.code()}")
+                    "Unknown error code"
                 }
-            }
 
-            override fun onFailure(call: Call<ResponseCreateUserWrapperDto>, t: Throwable) {
-                Log.e(TAG, "API 호출 도중 에러 발생: ${t.message}")
+                _signUpResult.value = Result.failure(Exception("Status code is ${response.code()} and error code is $errorCode"))
             }
-        })
+        } catch (e: Exception) {
+            Log.e("Login error", "Exception: ${e.message}")
+            _signUpResult.value = Result.failure(e)
+        }
+
     }
-
-
-
-
 }

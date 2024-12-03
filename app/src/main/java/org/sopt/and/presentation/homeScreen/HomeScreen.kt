@@ -1,10 +1,8 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package org.sopt.and.presentation.homeScreen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +14,6 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -41,14 +38,10 @@ import org.sopt.and.ui.components.TopBar.CustomTopAppBarSecond
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 
-//@Serializable
-//data object HomeScreen
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navController: NavController, // navController를 넘겨 받아 사용
+    navController: NavController,
     homeViewModel: HomeViewModel = viewModel()
 ) {
     val context = LocalContext.current
@@ -56,7 +49,9 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            Column {
+            Column(
+                modifier = modifier.fillMaxWidth()
+            ){
                 CustomTopAppBar(navController = navController)
                 CustomTopAppBarSecond(navController = navController)
             }
@@ -64,13 +59,12 @@ fun HomeScreen(
         bottomBar = {
             CustomBottomAppBar(navController = navController)
         }
-    ) { innerPadding ->
+    ) { it
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
                 .background(Color(0xFF1B1B1B))
-                .padding(innerPadding)  // 패딩 적용
                 .padding(all = 10.dp)
         ) {
 
@@ -144,49 +138,9 @@ fun HomeScreenPreview() {
     val navController = rememberNavController()
     val homeViewModel = HomeViewModel()
 
-    ANDANDROIDTheme {
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            topBar = {
-                Column{
-                    CustomTopAppBar(navController = navController)
-                    CustomTopAppBarSecond(navController = navController)
+    HomeScreen(
+        navController = navController,
+        homeViewModel = homeViewModel
+    )
 
-                }
-
-            },
-            bottomBar = {
-                CustomBottomAppBar(navController = navController)
-            }
-        ) {
-                innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFF1B1B1B))
-                    .padding(innerPadding)
-            ){
-                NavHost(
-                    navController = navController,
-                    startDestination = "home",
-                ){
-                    composable("home") {HomeScreen(
-                        navController = navController,
-                        homeViewModel = homeViewModel
-                    )}
-                    composable("search") {
-                        SearchScreen(
-                            navController = navController
-                        )
-                    }
-                    composable("profile") {
-                        MypageScreen(
-                            navController = navController,
-                        )
-                    }
-                }
-            }
-
-        }
-    }
 }

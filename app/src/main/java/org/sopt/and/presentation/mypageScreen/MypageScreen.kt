@@ -33,7 +33,6 @@ fun MypageScreen(
     navController: NavController,
     mypageViewModel: MypageViewModel = viewModel()
 ) {
-
     val user by mypageViewModel.user.collectAsState()
 
     Scaffold(

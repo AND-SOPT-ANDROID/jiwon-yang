@@ -15,6 +15,4 @@ object ServiceModule {
     @Singleton
     fun providesService(retrofit: Retrofit): UserService =
         retrofit.create(UserService::class.java)
-
-
 }

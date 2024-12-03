@@ -13,11 +13,11 @@ import javax.inject.Inject
 class UserInfoRemoteDataSourceImpl @Inject constructor (
     private val service: UserService
 ) : UserInfoRemoteDataSource {
-    override suspend fun postSignup(request: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto> =
-        service.signUpUser(request)
+    override suspend fun postSignup(requestCreateUserDto: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto> =
+        service.signUpUser(requestCreateUserDto)
 
-    override suspend fun postLogin(request: RequestGetUserDto): Response<ResponseGetUserDto> =
-        service.logInUser(request)
+    override suspend fun postLogin(requestGetUserDto: RequestGetUserDto): Response<ResponseGetUserDto> =
+        service.logInUser(requestGetUserDto)
 
     override suspend fun getUserHobby(token: String): Response<ResponseGetUserHobbyDto> =
         service.getMyHobby(token)

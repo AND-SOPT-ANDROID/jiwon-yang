@@ -9,9 +9,9 @@ import org.sopt.and.data.dataremote.model.response.ResponseGetUserHobbyFailDto
 import retrofit2.Response
 
 interface UserInfoRemoteDataSource {
-    suspend fun postSignup(request: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto>
+    suspend fun postSignup(requestCreateUserDto: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto>
 
-    suspend fun postLogin(request: RequestGetUserDto): Response<ResponseGetUserDto>
+    suspend fun postLogin(requestGetUserDto: RequestGetUserDto): Response<ResponseGetUserDto>
 
     suspend fun getUserHobby(token: String): Response<ResponseGetUserHobbyDto>
 }

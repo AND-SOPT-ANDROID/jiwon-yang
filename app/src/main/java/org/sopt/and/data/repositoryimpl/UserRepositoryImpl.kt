@@ -15,11 +15,11 @@ class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserInfoRemoteDataSource,
     private val userLocalDataSource: UserInfoLocalDataSource
 ) : UserRepository {
-    override suspend fun postSignUp(requestDto: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto> =
-        userRemoteDataSource.postSignup(requestDto)
+    override suspend fun postSignUp(requestCreateUserDto: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto> =
+        userRemoteDataSource.postSignup(requestCreateUserDto)
 
-    override suspend fun postLogin(requestDto: RequestGetUserDto): Response<ResponseGetUserDto> =
-        userRemoteDataSource.postLogin(requestDto)
+    override suspend fun postLogin(requestGetUserDto: RequestGetUserDto): Response<ResponseGetUserDto> =
+        userRemoteDataSource.postLogin(requestGetUserDto)
 
     override suspend fun getUserHobby(token: String): Response<ResponseGetUserHobbyDto> =
         userRemoteDataSource.getUserHobby(token)

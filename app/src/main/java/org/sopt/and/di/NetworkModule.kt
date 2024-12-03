@@ -18,7 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    @OptIn(ExperimentalSerializationApi::class)
     @Provides
     @Singleton
     fun providesJson(): Json =
@@ -62,7 +61,7 @@ object NetworkModule {
         json: Json
     ): Retrofit =
         Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl("http://223.130.135.50:8085")
             .client(okHttpClient)
             .addConverterFactory(
                 json.asConverterFactory(requireNotNull("application/json".toMediaTypeOrNull()))

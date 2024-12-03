@@ -35,7 +35,6 @@ class LoginViewModel(
     private val _loginResult = MutableStateFlow<Boolean?>(null)
     val loginResult = _loginResult.asStateFlow()
 
-
     private val _isUserNameValid = MutableStateFlow(false)
     val isUserNameValid: StateFlow<Boolean> = _isUserNameValid
 

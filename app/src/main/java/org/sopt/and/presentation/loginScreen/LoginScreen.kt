@@ -19,6 +19,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.sopt.and.presentation.signupScreen.StringInputValidCheck
@@ -133,33 +135,12 @@ fun LoginScreen(
             // 로그인 버튼
             Button(
                 onClick = {
-                    var loginMessage = ""
-                    var loginSuccessFlag = 0
-
+                    // 일단 글자 조건(8자)에 맞으면 logInUser API를 불러 봄
                     if (loginViewModel.isLoginValid(userNameText.value, passwordText.value)) {
-                        loginMessage = "로그인 성공"
-                        loginSuccessFlag = 1
-
                         coroutineScope.launch {
                             loginViewModel.logInUser()
                         }
-
-
-                        /*TODO: 백엔드 연결 후 해당 코드 삭제*/
-//                        userViewModel.setUserName(userNameText)
-
-                    } else {
-                        loginMessage = "알맞은 유저 이름과 비밀번호를 입력하세요"
                     }
-
-//                    scope.launch {
-//                        val snackbarResult = snackbarHostState.showSnackbar(loginMessage)
-//
-//                        if (loginSuccessFlag == 1 && snackbarResult == SnackbarResult.Dismissed) {
-//                            userViewModel.setUserName(userNameState)
-//                            navigateToHomeScreen()
-//                        }
-//                    }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth()
@@ -185,6 +166,17 @@ fun LoginScreen(
             // 소셜 로그인 섹션
             SocialLoginSection(modifier = modifier)
             Spacer(modifier = Modifier.weight(1f))
+        }
+        LaunchedEffect(loginResult){
+            loginResult?.let {
+                if (loginResult == true) {
+                    snackBarHostState.showSnackbar(message = "로그인에 성공했습니다.")
+                    delay(300)
+                    navigateToHomeScreen()
+                } else {
+                    snackBarHostState.showSnackbar(message = "유저 이름 혹은 비밀번호를 확인하세요.")
+                }
+            }
         }
     }
 }

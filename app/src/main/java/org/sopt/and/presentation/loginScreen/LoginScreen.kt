@@ -43,7 +43,6 @@ fun LoginScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-    // 사이드이펙트 처리
     LaunchedEffect(Unit) {
         loginViewModel.sideEffect.collect { sideEffect ->
             when (sideEffect) {
@@ -91,7 +90,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // 비밀번호 입력
             SignUpTextField(
                 text = uiState.password,
                 onValueChange = { loginViewModel.setEvent(LoginContract.LoginEvent.OnPasswordChanged(it)) },
@@ -128,7 +126,6 @@ fun LoginScreen(
             }
 
             Spacer(modifier = Modifier.weight(0.2f))
-            // 소셜 로그인 섹션
             SocialLoginSection(modifier = Modifier)
             Spacer(modifier = Modifier.weight(1f))
 

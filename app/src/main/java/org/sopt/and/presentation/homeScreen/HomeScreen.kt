@@ -39,7 +39,6 @@ fun HomeScreen(
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // SideEffect 처리 (네비게이션 및 단발성 이벤트)
     LaunchedEffect(homeViewModel.sideEffect) {
         homeViewModel.sideEffect.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest { sideEffect ->
             when (sideEffect) {
@@ -50,7 +49,6 @@ fun HomeScreen(
         }
     }
 
-    // 화면이 로드될 때 이벤트 전송
     LaunchedEffect(Unit) {
         homeViewModel.setEvent(HomeContract.HomeEvent.OnScreenLoaded)
     }

@@ -57,7 +57,7 @@ fun SignUpTextField(
                         text = buttonLabel,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable {
-                            onPasswordVisibilityChange() // 클릭 시 비밀번호 가시성 토글
+                            onPasswordVisibilityChange()
                         }
                     )
                 }

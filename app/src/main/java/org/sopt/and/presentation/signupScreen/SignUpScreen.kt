@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -31,50 +35,40 @@ import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
-fun StringInputValidCheck(newString: String): Boolean {
-    var isValid = false
-    val inputStr : CharSequence = newString
-
-    if(inputStr.length >= 8){
-        return isValid
-    } else {
-        return !isValid
-    }
-}
-
-fun PasswordValidCheck(password: String): Boolean {
-    val pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\$%^&*])|(?=.*[a-z])(?=.*\\d)(?=.*[!@#\$%^&*])|(?=.*[A-Z])(?=.*\\d)(?=.*[!@#\$%^&*]).{1,8}\$".toRegex()
-    return password.matches(pattern)
-}
-
-
 @Composable
 fun SignUpScreen(
     modifier: Modifier = Modifier,
-    navigateToLoginScreen: (user: User) -> Unit = {},
+    navigateToLoginScreen: () -> Unit,
     signUpViewModel: SignUpViewModel = hiltViewModel()
 ) {
-
-    val context = LocalContext.current
-    var toastMessage = ""
-
-    var userNameText = remember { mutableStateOf("") }
-    var passwordText = remember { mutableStateOf("") }
-    var hobbyText = remember { mutableStateOf("") }
-
-    var isUserNameValid = signUpViewModel.isUserNameValid.collectAsState().value
-    var isPasswordValid = signUpViewModel.isPasswordValid.collectAsState().value
-    var isHobbyValid = signUpViewModel.isHobbyValid.collectAsState().value
-    var shouldShowPassword = signUpViewModel.shouldShowPassword.collectAsState().value
-
+    val uiState by signUpViewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    // SideEffect 감지
+    LaunchedEffect(Unit) {
+        signUpViewModel.sideEffect.collect { sideEffect ->
+            when (sideEffect) {
+                is SignUpContract.SignUpSideEffect.ShowSuccessToast -> {
+                    Toast.makeText(context, "회원가입에 성공했습니다.", Toast.LENGTH_SHORT).show()
+                }
+                is SignUpContract.SignUpSideEffect.ShowErrorToast -> {
+                    Toast.makeText(context, sideEffect.message, Toast.LENGTH_SHORT).show()
+                }
+                is SignUpContract.SignUpSideEffect.NavigateToLoginScreen -> {
+                    navigateToLoginScreen()
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF1B1B1B))
-            .padding(25.dp),
-    ){
+            .padding(25.dp)
+    ) {
         Spacer(modifier = Modifier.height(20.dp))
         Text(
             "회원가입",
@@ -85,60 +79,44 @@ fun SignUpScreen(
 
         )
         Spacer(modifier = Modifier.weight(0.35f))
-
         Text(
             "유저 이름, 비밀번호, 취미 입력만으로\nWavve를 즐길 수 있어요!",
             color = Color.White,
             fontSize = 21.sp
         )
-
         Spacer(modifier = Modifier.weight(0.25f))
 
         SignUpTextField(
-            text = userNameText.value,
-            onValueChange = {
-                userNameText.value = it
-                signUpViewModel.onUserNameChange(it)
-                isUserNameValid = StringInputValidCheck(it)
-            },
-            fieldType = "userName",
-            conditionCheck = isUserNameValid,
+            text = uiState.userName,
+            onValueChange = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnUserNameChanged(it)) },
+            fieldType = "Username",
+            conditionCheck = uiState.isUserNameValid,
             errMessage = "유저 이름은 7자 이하여야 합니다.",
             placeholder = "유저 이름 (7자 이하)",
-            descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확하게 입력해주세요.",
+            descriptionText = "로그인, 비밀번호 찾기, 알림에 사용되니 정확하게 입력해주세요."
         )
-
         Spacer(modifier = Modifier.weight(0.15f))
 
         SignUpTextField(
-            text = passwordText.value,
-            onValueChange = {
-                passwordText.value = it
-                signUpViewModel.onPasswordChange(it) /*todo: onpasswordchange 안에 isvalid 체킹하는 로직을 넣기.*/
-                isPasswordValid = PasswordValidCheck(it)
-            },
+            text = uiState.password,
+            onValueChange = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnPasswordChanged(it)) },
             fieldType = "Password",
-            conditionCheck = isPasswordValid,
-            errMessage = "올바른 비밀번호 형식이 아닙니다.",
-            placeholder = "Wavve 비밀번호 설정",
-            shouldShowPassword = shouldShowPassword,
+            conditionCheck = uiState.isPasswordValid,
+            errMessage = "비밀번호는 8~20자 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.",
+            placeholder = "비밀번호 입력",
+            shouldShowPassword = uiState.shouldShowPassword,
             onPasswordVisibilityChange = {
-                signUpViewModel.togglePasswordVisibility()
+                signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnTogglePasswordVisibility)
             },
-            descriptionText = "비밀번호는 8~20자 이내로 영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용하여 입력해 주세요.",
+            descriptionText = "비밀번호는 8~20자 이내로 영문, 숫자, 특수문자 중 3가지 이상 혼용해주세요."
         )
-
         SignUpTextField(
-            text = hobbyText.value,
-            onValueChange = {
-                hobbyText.value = it
-                signUpViewModel.onHobbyChange(it)
-                isHobbyValid = StringInputValidCheck(it)
-            },
-            fieldType = "hobby",
-            conditionCheck = isHobbyValid,
-            errMessage = "취미은 7자 이하여야 합니다.",
-            placeholder = "취미 입력",
+            text = uiState.hobby,
+            onValueChange = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnHobbyChanged(it)) },
+            fieldType = "Hobby",
+            conditionCheck = uiState.isHobbyValid,
+            errMessage = "취미는 7자 이하여야 합니다.",
+            placeholder = "취미 입력"
         )
 
         Spacer(modifier = Modifier.weight(0.5f))
@@ -146,54 +124,22 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            "Wavve 회원가입",
-            textAlign = TextAlign.Center,
+            text = "Wavve 회원가입",
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.DarkGray)
-                .padding(vertical = 13.dp)
-                .clickable {
-
-                    /*Todo: 클릭 시 조건 검사 및 토스트 띄우는 것까지 createNewUser 안에 넣기*/
-
-                    //유저 네임 형식 조건 검사
-                    if (!StringInputValidCheck(userNameText.value)) {
-                        toastMessage = "형식에 맞는 유저 네임을 입력하세요"
-
-                    }
-                    //비밀번호 형식 조건 검사
-                    if (!PasswordValidCheck(passwordText.value)) {
-                        toastMessage = "조건에 맞는 비밀번호를 사용하세요"
-                    }
-
-                    if (signUpViewModel.isSignUpValid()) {
-
-                        coroutineScope.launch {
-                            signUpViewModel.createNewUser()
-                        }
-
-                        toastMessage = "회원가입에 성공하였습니다."
-
-                        navigateToLoginScreen(User(userNameText.value, passwordText.value))
-                    }
-
-                    Toast
-                        .makeText(context, toastMessage, Toast.LENGTH_SHORT)
-                        .show()
-
-                },
-            color = Color.White
+                .padding(13.dp)
+                .clickable { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnSignUpButtonClicked) },
+            color = Color.White,
+            textAlign = TextAlign.Center
         )
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
-fun SignUpPreview() {
-    ANDANDROIDTheme {
-        SignUpScreen(
-        )
-    }
+fun SignUpScreenPreview() {
+    SignUpScreen(
+        navigateToLoginScreen = { } // 더미 함수 전달
+    )
 }

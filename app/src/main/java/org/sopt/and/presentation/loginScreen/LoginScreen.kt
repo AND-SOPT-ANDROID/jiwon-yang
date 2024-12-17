@@ -1,7 +1,10 @@
 package org.sopt.and.presentation.loginScreen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
 import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
+import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 
 @Composable
 fun LoginScreen(
@@ -53,14 +57,15 @@ fun LoginScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { paddingValues ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+                .background(Color(0xFF1B1B1B))
+                .padding(innerPadding)
+                .padding(25.dp)
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -75,7 +80,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 유저네임 입력
             SignUpTextField(
                 text = uiState.userName,
                 onValueChange = { loginViewModel.setEvent(LoginContract.LoginEvent.OnUserNameChanged(it)) },
@@ -94,7 +98,7 @@ fun LoginScreen(
                 fieldType = "Password",
                 conditionCheck = uiState.isPasswordValid,
                 placeholder = "비밀번호 입력",
-                errMessage = "비밀번호는 8자 이상이어야 합니다.",
+                errMessage = "비밀번호는 8자 이내여야 합니다.",
                 shouldShowPassword = uiState.shouldShowPassword,
                 onPasswordVisibilityChange = {
                     loginViewModel.setEvent(LoginContract.LoginEvent.OnTogglePasswordVisibility)
@@ -110,6 +114,23 @@ fun LoginScreen(
             ) {
                 Text("로그인", color = Color.White)
             }
+
+            Spacer(modifier = Modifier.weight(0.2f))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text("아이디 찾기", color = Color.Gray, fontSize = 13.sp)
+                Text(" | ", color = Color.Gray, fontSize = 13.sp)
+                Text("비밀번호 재설정", color = Color.Gray, fontSize = 13.sp)
+                Text(" | ", color = Color.Gray, fontSize = 13.sp)
+                Text("회원가입", color = Color.Gray, fontSize = 13.sp)
+            }
+
+            Spacer(modifier = Modifier.weight(0.2f))
+            // 소셜 로그인 섹션
+            SocialLoginSection(modifier = Modifier)
+            Spacer(modifier = Modifier.weight(1f))
 
             if (uiState.isLoading) {
                 Spacer(modifier = Modifier.height(16.dp))

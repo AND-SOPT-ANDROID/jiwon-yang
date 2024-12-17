@@ -22,7 +22,7 @@ class LoginViewModel @Inject constructor(
                 setState { copy(userName = event.userName, isUserNameValid = event.userName.length <= 7) }
             }
             is LoginContract.LoginEvent.OnPasswordChanged -> {
-                setState { copy(password = event.password, isPasswordValid = event.password.length >= 8) }
+                setState { copy(password = event.password, isPasswordValid = event.password.length <= 8) }
             }
             LoginContract.LoginEvent.OnTogglePasswordVisibility -> {
                 setState { copy(shouldShowPassword = !shouldShowPassword) }
@@ -48,6 +48,7 @@ class LoginViewModel @Inject constructor(
                 saveUserNameUseCase(currentState.userName)
                 saveAccessTokenUseCase(response.body()!!.result.token)
                 sendSideEffect(LoginContract.LoginSideEffect.NavigateToHome)
+                sendSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인에 성공했습니다."))
             } else {
                 sendSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("유저 이름 혹은 비밀번호를 확인하세요."))
             }

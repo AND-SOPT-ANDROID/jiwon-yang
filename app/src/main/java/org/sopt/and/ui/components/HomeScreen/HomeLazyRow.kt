@@ -29,7 +29,8 @@ fun HomeLazyRow(
     images: List<Int>,
     height: Int,
     width: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onItemClick: (Int) -> Unit = {}
 ) {
     Column(
         modifier = modifier

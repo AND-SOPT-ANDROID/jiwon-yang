@@ -52,7 +52,11 @@ fun MyPageProfileSection(
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
-                "${deliveredUserHobby}를 즐기는\n${deliveredUserName}님",
+                text = if (deliveredUserHobby != null) {
+                    "${deliveredUserHobby}를 즐기는\n${deliveredUserName}님"
+                } else {
+                    "취미를 아직 등록하지 않은 ${deliveredUserName}님"
+                },
                 color = Color.White
             )
             Spacer(modifier = Modifier.weight(0.5f))

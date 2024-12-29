@@ -1,15 +1,16 @@
 package org.sopt.and.domain.usecase
 
-import org.sopt.and.data.dataremote.model.response.ResponseGetUserHobbyDto
-import org.sopt.and.domain.repository.UserRepository
-import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ValidateUserInputUseCase @Inject constructor() {
-    fun stringInputValidCheck(userInput: String) : Boolean {
-        return userInput.length <= 7
+    companion object {
+        const val MAX_USERNAME_LENGTH = 7
+    }
+
+    fun stringInputValidCheck(userName: String) : Boolean {
+        return userName.length <= MAX_USERNAME_LENGTH
     }
 
     fun passwordValidCheck(password: String) : Boolean {

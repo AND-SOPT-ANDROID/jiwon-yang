@@ -43,7 +43,7 @@ class MypageViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("MyPage", "Error loading user data: ${e.message}")
-                sendSideEffect(MypageContract.MyPageSideEffect.ShowErrorToast)
+                setSideEffect(MypageContract.MyPageSideEffect.ShowErrorToast)
             }
         }
     }

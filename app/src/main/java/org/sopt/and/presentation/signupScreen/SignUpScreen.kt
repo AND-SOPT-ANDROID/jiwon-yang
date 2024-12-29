@@ -42,8 +42,6 @@ fun SignUpScreen(
     signUpViewModel: SignUpViewModel = hiltViewModel()
 ) {
     val uiState by signUpViewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     // SideEffect 감지
@@ -140,6 +138,6 @@ fun SignUpScreen(
 @Composable
 fun SignUpScreenPreview() {
     SignUpScreen(
-        navigateToLoginScreen = { } // 더미 함수 전달
+        navigateToLoginScreen = { }
     )
 }

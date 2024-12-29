@@ -17,6 +17,7 @@ class SignUpViewModel @Inject constructor(
     private val validateUserInputUseCase: ValidateUserInputUseCase
 ) : BaseViewModel<SignUpContract.SignUpUiState, SignUpContract.SignUpEvent, SignUpContract.SignUpSideEffect>() {
 
+    //그래서 무슨 값으로 초기화가 되는거지?
     override fun createInitialState(): SignUpContract.SignUpUiState = SignUpContract.SignUpUiState()
 
     override suspend fun handleEvent(event: SignUpContract.SignUpEvent) {
@@ -26,7 +27,7 @@ class SignUpViewModel @Inject constructor(
                 setState { copy(userName = event.userName, isUserNameValid = isValid) }
             }
             is SignUpContract.SignUpEvent.OnPasswordChanged -> {
-                val isValid = validateUserInputUseCase.stringInputValidCheck(event.password)
+                val isValid = validateUserInputUseCase.passwordValidCheck(event.password)
                 setState { copy(password = event.password, isPasswordValid = isValid) }
             }
             is SignUpContract.SignUpEvent.OnHobbyChanged -> {
@@ -53,14 +54,13 @@ class SignUpViewModel @Inject constructor(
             try {
                 val response = postSignUpUseCase(requestDto)
                 if (response.isSuccessful) {
-                    //userInfoLocalDataSource.userName = currentState.userName
-                    sendSideEffect(SignUpContract.SignUpSideEffect.ShowSuccessToast)
-                    sendSideEffect(SignUpContract.SignUpSideEffect.NavigateToLoginScreen(currentState.userName, currentState.password))
+                    setSideEffect(SignUpContract.SignUpSideEffect.ShowSuccessToast)
+                    setSideEffect(SignUpContract.SignUpSideEffect.NavigateToLoginScreen) //인자 넘겨줄 필요 없음.
                 } else {
-                    sendSideEffect(SignUpContract.SignUpSideEffect.ShowErrorToast("회원가입 실패: ${response.code()}"))
+                    setSideEffect(SignUpContract.SignUpSideEffect.ShowErrorToast("회원가입 실패: ${response.code()}"))
                 }
             } catch (e: Exception) {
-                sendSideEffect(SignUpContract.SignUpSideEffect.ShowErrorToast("오류: ${e.message}"))
+                setSideEffect(SignUpContract.SignUpSideEffect.ShowErrorToast("오류: ${e.message}"))
             }
         }
     }

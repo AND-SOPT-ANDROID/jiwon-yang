@@ -4,12 +4,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import org.sopt.and.domain.usecase.PostLoginUseCase
 import org.sopt.and.domain.usecase.SaveAccessTokenUseCase
 import org.sopt.and.domain.usecase.SaveUserNameUseCase
+import org.sopt.and.domain.usecase.ValidateUserInputUseCase
+import org.sopt.and.presentation.signupScreen.SignUpContract
 import org.sopt.and.util.base.BaseViewModel
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val postLoginUseCase: PostLoginUseCase,
+    private val validateUserInputUseCase: ValidateUserInputUseCase,
     private val saveUserNameUseCase: SaveUserNameUseCase,
     private val saveAccessTokenUseCase: SaveAccessTokenUseCase
 ) : BaseViewModel<LoginContract.LoginUiState, LoginContract.LoginEvent, LoginContract.LoginSideEffect>() {
@@ -18,23 +22,27 @@ class LoginViewModel @Inject constructor(
 
     override suspend fun handleEvent(event: LoginContract.LoginEvent) {
         when (event) {
+
             is LoginContract.LoginEvent.OnUserNameChanged -> {
-                setState { copy(userName = event.userName, isUserNameValid = event.userName.length <= 7) }
+                val isValid = validateUserInputUseCase.stringInputValidCheck(event.userName)
+                setState { copy(userName = event.userName, isUserNameValid = isValid) }
             }
             is LoginContract.LoginEvent.OnPasswordChanged -> {
-                setState { copy(password = event.password, isPasswordValid = event.password.length <= 8) }
+                val isValid = validateUserInputUseCase.passwordValidCheck(event.password)
+                setState { copy(password = event.password, isPasswordValid = isValid) }
             }
             LoginContract.LoginEvent.OnTogglePasswordVisibility -> {
                 setState { copy(shouldShowPassword = !shouldShowPassword) }
             }
             LoginContract.LoginEvent.OnLoginButtonClicked -> {
+                setState { copy(isLoading = true) }
                 attemptLogin()
             }
         }
     }
 
     private suspend fun attemptLogin() {
-        setState { copy(isLoading = true) }
+        //setState { copy(isLoading = true) } //여기에서 state 변경시키면 안될듯
 
         val currentState = currentState
         val requestDto = org.sopt.and.data.dataremote.model.request.RequestGetUserDto(
@@ -47,13 +55,19 @@ class LoginViewModel @Inject constructor(
             if (response.isSuccessful && response.body()?.result?.token != null) {
                 saveUserNameUseCase(currentState.userName)
                 saveAccessTokenUseCase(response.body()!!.result.token)
-                sendSideEffect(LoginContract.LoginSideEffect.NavigateToHome)
-                sendSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인에 성공했습니다."))
+                setSideEffect(LoginContract.LoginSideEffect.NavigateToHome)
+                setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인에 성공했습니다."))
             } else {
-                sendSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("유저 이름 혹은 비밀번호를 확인하세요."))
+                setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인에 실패했습니다."))
+            }
+        } catch (e: HttpException) {
+            when (e.code()){
+                400 -> setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인 요청 정보가 올바르지 않습니다."))
+                403 -> setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("유저 이름 혹은 비밀번호가 일치하지 않습니다."))
+                404 -> setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("유효하지 않은 경로로 요청이 들어왔습니다.\n 처음부터 재시도하세요."))
             }
         } catch (e: Exception) {
-            sendSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인 요청 중 오류가 발생했습니다."))
+            setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인 요청 중 오류가 발생했습니다."))
         } finally {
             setState { copy(isLoading = false) }
         }

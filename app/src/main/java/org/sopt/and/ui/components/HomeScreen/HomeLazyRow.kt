@@ -49,7 +49,7 @@ fun HomeLazyRow(
             contentPadding = PaddingValues(start = 8.dp, end = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            items(images) { imageRes ->
+            items(items = images, key = { it }) { imageRes ->
                 Image(
                     modifier = Modifier
                         .size(width.dp, height.dp)
@@ -60,7 +60,5 @@ fun HomeLazyRow(
                 )
             }
         }
-
     }
-
 }

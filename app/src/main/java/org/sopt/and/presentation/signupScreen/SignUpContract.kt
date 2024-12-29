@@ -27,6 +27,6 @@ class SignUpContract {
     sealed interface SignUpSideEffect : UiSideEffect {
         data object ShowSuccessToast : SignUpSideEffect
         data class ShowErrorToast(val message: String) : SignUpSideEffect
-        data class NavigateToLoginScreen(val userName: String, val password: String) : SignUpSideEffect
+        data object NavigateToLoginScreen : SignUpSideEffect
     }
 }

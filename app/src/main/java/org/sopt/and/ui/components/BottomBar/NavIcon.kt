@@ -8,12 +8,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.sopt.and.R
 import org.sopt.and.presentation.homeScreen.HomeScreen
@@ -26,13 +29,18 @@ import org.sopt.and.util.Route
 @Composable
 fun NavIcon(
     navController: NavController,
+    navBarViewModel: NavBarViewModel = hiltViewModel(),
     route: String,
     modifier: Modifier = Modifier,
     icon: ImageVector,
-    text: String
+    text: String,
+    pageIndex: Int
 ){
+    val uiState by navBarViewModel.uiState.collectAsStateWithLifecycle()
+
     Column(
         modifier = modifier.clickable {
+            navBarViewModel.setEvent(NavBarContract.NavBarEvent.OnPageSelected(pageIndex))
             when (route) {
                 "home" -> {
                     navController.navigate(Route.HomeScreen)
@@ -41,7 +49,7 @@ fun NavIcon(
                     navController.navigate(Route.SearchScreen)
                 }
                 "profile" -> {
-                    navController.navigate(Route.MypageScreen(userName = "")) /*username을 여기다 어떻게 넣어주지?*/
+                    navController.navigate(Route.MypageScreen(userName = uiState.userName))
                 }
             }
         },

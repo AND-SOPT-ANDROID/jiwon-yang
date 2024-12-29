@@ -41,7 +41,8 @@ class MainActivity : ComponentActivity() {
 
                         NavHost(
                             navController = navController,
-                            startDestination = Route.SignUpScreen(userName = "", password = ""),
+//                            startDestination = Route.SignUpScreen(userName = "", password = ""),
+                            startDestination = Route.HomeScreen,
                             modifier = Modifier
                         ){
                             composable<Route.SignUpScreen> { backStackEntry ->

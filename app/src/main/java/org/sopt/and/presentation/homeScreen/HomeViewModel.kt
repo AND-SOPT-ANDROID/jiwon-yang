@@ -24,7 +24,7 @@ open class HomeViewModel @Inject constructor() :
     override suspend fun handleEvent(event: HomeContract.HomeEvent) {
         when (event) {
             is HomeContract.HomeEvent.OnImageClicked -> {
-                sendSideEffect(HomeContract.HomeSideEffect.NavigateToDetail(event.imageIndex))
+                setSideEffect(HomeContract.HomeSideEffect.NavigateToDetail(event.imageIndex))
             }
             is HomeContract.HomeEvent.OnScreenLoaded -> {
                 setState { copy(isLoading = true) }

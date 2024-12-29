@@ -25,7 +25,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,7 +38,7 @@ import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 @Composable
 fun LoginScreen(
     navigateToHomeScreen: () -> Unit,
-    loginViewModel: LoginViewModel = hiltViewModel()
+    loginViewModel: LoginViewModel = hiltViewModel() //뷰모델을 직접 넣어주는게 아닌듯. 하나하나 함수별로 넣어주는 듯
 ) {
     val uiState = loginViewModel.uiState.collectAsState().value
     val snackbarHostState = remember { SnackbarHostState() }
@@ -70,7 +71,7 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.wavve_logo),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.wavve_logo),
                     contentDescription = "Logo",
                     modifier = Modifier
                         .size(100.dp)
@@ -129,10 +130,6 @@ fun LoginScreen(
             SocialLoginSection(modifier = Modifier)
             Spacer(modifier = Modifier.weight(1f))
 
-            if (uiState.isLoading) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text("로딩 중...", color = Color.Gray, fontSize = 14.sp)
-            }
         }
     }
 }

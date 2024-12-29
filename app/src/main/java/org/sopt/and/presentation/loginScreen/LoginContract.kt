@@ -16,6 +16,7 @@ class LoginContract {
         val shouldShowPassword: Boolean = false
     ) : UiState
 
+
     sealed class LoginEvent : UiEvent {
         data class OnUserNameChanged(val userName: String) : LoginEvent()
         data class OnPasswordChanged(val password: String) : LoginEvent()

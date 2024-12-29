@@ -1,8 +1,6 @@
 package org.sopt.and.domain.usecase
 
-import org.sopt.and.data.dataremote.model.response.ResponseGetUserHobbyDto
 import org.sopt.and.domain.repository.UserRepository
-import retrofit2.Response
 import javax.inject.Inject
 import javax.inject.Singleton
 

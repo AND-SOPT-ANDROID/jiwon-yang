@@ -1,28 +1,47 @@
 package org.sopt.and.data.repositoryimpl
 
 import jakarta.inject.Inject
+import kotlinx.serialization.json.Json
 import org.sopt.and.data.datalocal.datasource.UserInfoLocalDataSource
 import org.sopt.and.data.dataremote.datasource.UserInfoRemoteDataSource
-import org.sopt.and.data.dataremote.model.request.RequestCreateUserDto
-import org.sopt.and.data.dataremote.model.request.RequestGetUserDto
-import org.sopt.and.data.dataremote.model.response.ResponseCreateUserSuccessDto
-import org.sopt.and.data.dataremote.model.response.ResponseGetUserDto
-import org.sopt.and.data.dataremote.model.response.ResponseGetUserHobbyDto
+import org.sopt.and.data.mapper.UserMapper
+import org.sopt.and.domain.model.LoginResult
+import org.sopt.and.domain.model.SignUpResult
+import org.sopt.and.domain.model.User
 import org.sopt.and.domain.repository.UserRepository
-import retrofit2.Response
 
 class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserInfoRemoteDataSource,
     private val userLocalDataSource: UserInfoLocalDataSource
 ) : UserRepository {
-    override suspend fun postSignUp(requestCreateUserDto: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto> =
-        userRemoteDataSource.postSignup(requestCreateUserDto)
+    override suspend fun postSignUp(user: User): SignUpResult {
+        val requestDto = UserMapper.toRequestCreateUserDto(user)
+        val response = userRemoteDataSource.postSignup(requestDto)
 
-    override suspend fun postLogin(requestGetUserDto: RequestGetUserDto): Response<ResponseGetUserDto> =
-        userRemoteDataSource.postLogin(requestGetUserDto)
+        return if (response.isSuccessful) {
+            response.body()?.let { UserMapper.toSignUpResult(it) }
+                ?: throw IllegalStateException("회원가입 실패")
+        } else {
+            val errorCode = response.errorBody()?.string()?.let { errorBody ->
+                Json.decodeFromString<Map<String, String>>(errorBody)["code"]
+            }
+            SignUpResult(userId = null, errorCode = errorCode ?: "UNKNOWN_ERROR")
+        }
+    }
 
-    override suspend fun getUserHobby(token: String): Response<ResponseGetUserHobbyDto> =
-        userRemoteDataSource.getUserHobby(token)
+    override suspend fun postLogin(user: User): LoginResult {
+        val requestDto = UserMapper.toRequestGetUserDto(user)
+        val response = userRemoteDataSource.postLogin(requestDto)
+
+        return response.body()?.let { UserMapper.toLoginResult(it) }
+            ?: throw IllegalStateException("로그인 실패")
+    }
+
+    override suspend fun getUserHobby(token: String): String? {
+        val response = userRemoteDataSource.getUserHobby(token)
+        return response.body()?.result?.userHobby
+    }
+
 
     override fun saveAccessToken(token: String) {
         userLocalDataSource.accessToken = token

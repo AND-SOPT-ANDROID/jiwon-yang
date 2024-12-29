@@ -1,16 +1,13 @@
 package org.sopt.and.domain.repository
 
-import org.sopt.and.data.dataremote.model.request.RequestCreateUserDto
-import org.sopt.and.data.dataremote.model.request.RequestGetUserDto
-import org.sopt.and.data.dataremote.model.response.ResponseCreateUserSuccessDto
-import org.sopt.and.data.dataremote.model.response.ResponseGetUserDto
-import org.sopt.and.data.dataremote.model.response.ResponseGetUserHobbyDto
-import retrofit2.Response
+import org.sopt.and.domain.model.LoginResult
+import org.sopt.and.domain.model.SignUpResult
+import org.sopt.and.domain.model.User
 
 interface UserRepository {
-    suspend fun postSignUp(requestCreateUserDto: RequestCreateUserDto): Response<ResponseCreateUserSuccessDto>
-    suspend fun postLogin(requestGetUserDto: RequestGetUserDto): Response<ResponseGetUserDto>
-    suspend fun getUserHobby(token: String): Response<ResponseGetUserHobbyDto>
+    suspend fun postSignUp(user: User): SignUpResult
+    suspend fun postLogin(user: User): LoginResult
+    suspend fun getUserHobby(token: String): String?
 
     fun saveAccessToken(token: String)
     fun saveUserName(name: String)

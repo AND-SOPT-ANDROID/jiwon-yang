@@ -13,7 +13,8 @@ class SignUpContract {
         val isUserNameValid: Boolean = true,
         val isPasswordValid: Boolean = true,
         val isHobbyValid: Boolean = true,
-        val shouldShowPassword: Boolean = false
+        val shouldShowPassword: Boolean = false,
+        val isLoading: Boolean? = false,
     ) : UiState
 
     sealed class SignUpEvent : UiEvent {

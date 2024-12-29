@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import org.sopt.and.domain.usecase.GetUserHobbyUseCase
-import org.sopt.and.data.datalocal.datasource.UserInfoLocalDataSource
+import org.sopt.and.domain.usecase.GetUserInfoUseCase
 import org.sopt.and.util.base.BaseViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class MypageViewModel @Inject constructor(
-    private val userInfoLocalDataSource: UserInfoLocalDataSource,
+    private val getUserInfoUseCase: GetUserInfoUseCase,
     private val getUserHobbyUseCase: GetUserHobbyUseCase
 ) : BaseViewModel<MypageContract.MyPageUiState, MypageContract.MyPageEvent, MypageContract.MyPageSideEffect>() {
 
@@ -30,15 +30,14 @@ class MypageViewModel @Inject constructor(
     private fun loadUserData() {
         viewModelScope.launch {
             try {
-                val userName = userInfoLocalDataSource.userName
-                val accessToken = userInfoLocalDataSource.accessToken
-                val hobby = getUserHobbyUseCase(accessToken).body()?.result?.userHobby ?: "취미 없음"
+                val userInfo = getUserInfoUseCase()
+                val hobby = getUserHobbyUseCase(userInfo.accessToken)
 
                 setState {
                     copy(
                         userName = userName,
                         accessToken = accessToken,
-                        userHobby = hobby
+                        userHobby = hobby ?: "취미 없음"
                     )
                 }
             } catch (e: Exception) {

@@ -1,11 +1,11 @@
 package org.sopt.and.presentation.loginScreen
 
 import dagger.hilt.android.lifecycle.HiltViewModel
+import org.sopt.and.domain.model.User
 import org.sopt.and.domain.usecase.PostLoginUseCase
 import org.sopt.and.domain.usecase.SaveAccessTokenUseCase
 import org.sopt.and.domain.usecase.SaveUserNameUseCase
 import org.sopt.and.domain.usecase.ValidateUserInputUseCase
-import org.sopt.and.presentation.signupScreen.SignUpContract
 import org.sopt.and.util.base.BaseViewModel
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -42,24 +42,23 @@ class LoginViewModel @Inject constructor(
     }
 
     private suspend fun attemptLogin() {
-        //setState { copy(isLoading = true) } //여기에서 state 변경시키면 안될듯
 
         val currentState = currentState
-        val requestDto = org.sopt.and.data.dataremote.model.request.RequestGetUserDto(
-            userName = currentState.userName,
-            password = currentState.password
-        )
 
         try {
-            val response = postLoginUseCase(requestDto)
-            if (response.isSuccessful && response.body()?.result?.token != null) {
-                saveUserNameUseCase(currentState.userName)
-                saveAccessTokenUseCase(response.body()!!.result.token)
-                setSideEffect(LoginContract.LoginSideEffect.NavigateToHome)
-                setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인에 성공했습니다."))
-            } else {
-                setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인에 실패했습니다."))
-            }
+            val user = User(
+                name = currentState.userName,
+                password = currentState.password,
+                hobby = ""
+            )
+
+            val loginResult = postLoginUseCase(user)
+
+            saveUserNameUseCase(currentState.userName)
+            saveAccessTokenUseCase(loginResult.accessToken)
+            setSideEffect(LoginContract.LoginSideEffect.NavigateToHome)
+            setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인에 성공했습니다."))
+
         } catch (e: HttpException) {
             when (e.code()){
                 400 -> setSideEffect(LoginContract.LoginSideEffect.ShowSnackbar("로그인 요청 정보가 올바르지 않습니다."))

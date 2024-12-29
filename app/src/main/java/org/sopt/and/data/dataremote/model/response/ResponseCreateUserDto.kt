@@ -4,12 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ResponseCreateUserFailedDto(
-    @SerialName("code")
-    val code: String
-)
-
-@Serializable
 data class ResponseCreateUserSuccessDto(
     @SerialName("result")
     val result: UserResult

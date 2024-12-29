@@ -42,7 +42,6 @@ fun LoginScreen(
 ) {
     val uiState = loginViewModel.uiState.collectAsState().value
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         loginViewModel.sideEffect.collect { sideEffect ->

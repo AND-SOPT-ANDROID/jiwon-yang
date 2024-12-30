@@ -17,12 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import org.sopt.and.R
 
 @Composable
-fun CustomTopAppBar(navController: NavController){
+fun CustomTopAppBar(){
     TopAppBar(
         title = { },
         colors = topAppBarColors(
@@ -55,4 +57,10 @@ fun CustomTopAppBar(navController: NavController){
             )
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AppbarFirstPreivew(){
+    CustomTopAppBar()
 }

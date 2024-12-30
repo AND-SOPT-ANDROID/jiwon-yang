@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 fun SignUpTextField(
     modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit,
-    fieldType: String, //Email 혹은 Password로 전달 예정
+    fieldType: String, //Username 혹은 Password로 전달 예정
     text: String,
     conditionCheck: Boolean,
     errMessage: String,
@@ -57,7 +57,7 @@ fun SignUpTextField(
                         text = buttonLabel,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable {
-                            onPasswordVisibilityChange() // 클릭 시 비밀번호 가시성 토글
+                            onPasswordVisibilityChange()
                         }
                     )
                 }

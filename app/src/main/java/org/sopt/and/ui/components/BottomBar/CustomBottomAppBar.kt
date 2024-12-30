@@ -18,7 +18,6 @@ fun CustomBottomAppBar(navController: NavController) {
     BottomAppBar(
         containerColor = Color.Black,
         contentColor = Color.White,
-
         ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -28,19 +27,22 @@ fun CustomBottomAppBar(navController: NavController) {
                 navController = navController,
                 route = "home",
                 icon = Icons.Filled.Home,
-                text = "홈"
+                text = "홈",
+                pageIndex = 0
             )
             NavIcon(
                 navController = navController,
                 route = "search",
                 icon = Icons.Filled.Search,
-                text = "검색"
+                text = "검색",
+                pageIndex = 1
             )
             NavIcon(
                 navController = navController,
                 route = "profile",
                 icon = Icons.Filled.Person,
-                text = "MY"
+                text = "MY",
+                pageIndex = 2
             )
         }
     }

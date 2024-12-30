@@ -19,12 +19,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.sopt.and.R
-import org.sopt.and.presentation.homeScreen.HomeScreen
-import org.sopt.and.presentation.homeScreen.HomeViewModel
-import org.sopt.and.presentation.mypageScreen.MypageScreen
-import org.sopt.and.presentation.mypageScreen.MypageViewModel
-import org.sopt.and.presentation.searchScreen.SearchScreen
-import org.sopt.and.util.Route
 
 @Composable
 fun NavIcon(
@@ -43,13 +37,19 @@ fun NavIcon(
             navBarViewModel.setEvent(NavBarContract.NavBarEvent.OnPageSelected(pageIndex))
             when (route) {
                 "home" -> {
-                    navController.navigate(Route.HomeScreen)
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = true }
+                    }
                 }
                 "search" -> {
-                    navController.navigate(Route.SearchScreen)
+                    navController.navigate("search") {
+                        popUpTo("search") { inclusive = true }
+                    }
                 }
                 "profile" -> {
-                    navController.navigate(Route.MypageScreen(userName = uiState.userName))
+                    navController.navigate("mypage") {
+                        popUpTo("mypage") { inclusive = true }
+                    }
                 }
             }
         },

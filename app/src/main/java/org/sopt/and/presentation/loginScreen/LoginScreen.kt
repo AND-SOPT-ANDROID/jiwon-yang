@@ -36,10 +36,10 @@ import org.sopt.and.ui.components.SignUpandLogIn.SignUpTextField
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 
 @Composable
-fun LoginScreen(
+fun LoginRoute(
     navigateToHomeScreen: () -> Unit,
-    loginViewModel: LoginViewModel = hiltViewModel() //뷰모델을 직접 넣어주는게 아닌듯. 하나하나 함수별로 넣어주는 듯
-) {
+    loginViewModel: LoginViewModel = hiltViewModel()
+){
     val uiState = loginViewModel.uiState.collectAsState().value
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -53,6 +53,28 @@ fun LoginScreen(
             }
         }
     }
+
+    LoginScreen(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onUserNameChanged = { loginViewModel.setEvent(LoginContract.LoginEvent.OnUserNameChanged(it)) },
+        onPasswordChanged = { loginViewModel.setEvent(LoginContract.LoginEvent.OnPasswordChanged(it)) },
+        onTogglePasswordVisibility = {loginViewModel.setEvent(LoginContract.LoginEvent.OnTogglePasswordVisibility)},
+        onLoginButtonClicked = {loginViewModel.setEvent(LoginContract.LoginEvent.OnLoginButtonClicked)},
+    )
+}
+
+
+@Composable
+fun LoginScreen(
+    uiState: LoginContract.LoginUiState,
+    snackbarHostState: SnackbarHostState,
+    onUserNameChanged: (String) -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onLoginButtonClicked: () -> Unit,
+) {
+
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -81,7 +103,7 @@ fun LoginScreen(
 
             SignUpTextField(
                 text = uiState.userName,
-                onValueChange = { loginViewModel.setEvent(LoginContract.LoginEvent.OnUserNameChanged(it)) },
+                onValueChange = onUserNameChanged,
                 fieldType = "UserName",
                 conditionCheck = uiState.isUserNameValid,
                 placeholder = "유저 이름 (7자 이하)",
@@ -92,21 +114,19 @@ fun LoginScreen(
 
             SignUpTextField(
                 text = uiState.password,
-                onValueChange = { loginViewModel.setEvent(LoginContract.LoginEvent.OnPasswordChanged(it)) },
+                onValueChange = onPasswordChanged,
                 fieldType = "Password",
                 conditionCheck = uiState.isPasswordValid,
                 placeholder = "비밀번호 입력",
                 errMessage = "비밀번호는 8자 이내여야 합니다.",
                 shouldShowPassword = uiState.shouldShowPassword,
-                onPasswordVisibilityChange = {
-                    loginViewModel.setEvent(LoginContract.LoginEvent.OnTogglePasswordVisibility)
-                }
+                onPasswordVisibilityChange = onTogglePasswordVisibility
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { loginViewModel.setEvent(LoginContract.LoginEvent.OnLoginButtonClicked) },
+                onClick = onLoginButtonClicked,
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -133,8 +153,8 @@ fun LoginScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(navigateToHomeScreen = {})
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun LoginScreenPreview() {
+//    LoginScreen(navigateToHomeScreen = {})
+//}

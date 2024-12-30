@@ -24,7 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import org.sopt.and.R
 
 @Composable
-fun CustomTopAppBar(navController: NavController){
+fun CustomTopAppBar(){
     TopAppBar(
         title = { },
         colors = topAppBarColors(
@@ -62,6 +62,5 @@ fun CustomTopAppBar(navController: NavController){
 @Preview(showBackground = true)
 @Composable
 fun AppbarFirstPreivew(){
-    val navController = rememberNavController()
-    CustomTopAppBar(navController = navController)
+    CustomTopAppBar()
 }

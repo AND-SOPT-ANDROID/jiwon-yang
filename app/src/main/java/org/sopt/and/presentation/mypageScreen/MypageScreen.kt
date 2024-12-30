@@ -19,10 +19,10 @@ import org.sopt.and.ui.components.MypageScreen.MyPageProfileSection2
 import org.sopt.and.ui.components.MypageScreen.MyPageSubSection
 
 @Composable
-fun MypageScreen(
+fun MypageRoute(
     navController: NavController,
     mypageViewModel: MypageViewModel = hiltViewModel()
-) {
+){
     val uiState by mypageViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -39,6 +39,21 @@ fun MypageScreen(
         }
     }
 
+    MypageScreen(
+        navController = navController,
+        snackbarHostState = snackbarHostState,
+        myPageUiState = uiState,
+    )
+}
+
+@Composable
+fun MypageScreen(
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
+    myPageUiState: MypageContract.MyPageUiState,
+) {
+
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = { CustomBottomAppBar(navController = navController) }
@@ -50,8 +65,8 @@ fun MypageScreen(
                 .padding(innerPadding)
         ) {
             MyPageProfileSection(
-                deliveredUserName = uiState.userName,
-                deliveredUserHobby = uiState.userHobby
+                deliveredUserName = myPageUiState.userName,
+                deliveredUserHobby = myPageUiState.userHobby
             )
             Spacer(modifier = Modifier.height(0.5.dp))
             MyPageProfileSection2(
@@ -69,7 +84,7 @@ fun MypageScreen(
                     .padding(20.dp),
                 title = "전체 시청내역",
                 topic = "시청내역",
-                contentNumber = uiState.contentCount
+                contentNumber = myPageUiState.contentCount
             )
             Spacer(modifier = Modifier.height(16.dp))
             MyPageSubSection(
@@ -84,12 +99,12 @@ fun MypageScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun MyPagePreview() {
-    val navController = rememberNavController()
-
-    MypageScreen(navController = navController)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun MyPagePreview() {
+//    val navController = rememberNavController()
+//
+//    MypageScreen(navController = navController)
+//}
 
 

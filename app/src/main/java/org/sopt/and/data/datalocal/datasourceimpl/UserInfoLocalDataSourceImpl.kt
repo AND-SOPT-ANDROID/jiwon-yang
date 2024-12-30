@@ -21,12 +21,17 @@ class UserInfoLocalDataSourceImpl @Inject constructor(
         get() = sharedPreferences.getString(USERNAME, INITIAL_VALUE).toString()
         set(value) = sharedPreferences.edit { putString(USERNAME, value) }
 
+    override var hobby: String
+        get() = sharedPreferences.getString(HOBBY, INITIAL_VALUE).toString()
+        set(value) = sharedPreferences.edit { putString(HOBBY, value) }
+
     override fun clear() = sharedPreferences.edit { clear() }
 
     companion object {
         const val PREFERENCES_NAME = "user_preferences"
         const val ACCESSTOKEN = "accesstoken"
         const val USERNAME = "userName"
+        const val HOBBY = "hobby"
         const val INITIAL_VALUE = ""
     }
 }

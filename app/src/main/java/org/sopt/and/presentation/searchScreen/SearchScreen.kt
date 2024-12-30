@@ -15,6 +15,15 @@ import org.sopt.and.ui.components.BottomBar.CustomBottomAppBar
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
+fun SearchRoute(
+    navController: NavController,
+){
+    SearchScreen(
+        navController = navController
+    )
+}
+
+@Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
     navController: NavController
@@ -26,7 +35,7 @@ fun SearchScreen(
         }
     ) { innerPadding ->
         Text(
-            text = "검색 페이지\n입니다........................\n..........",
+            text = "검색 페이지 입니다.",
             modifier = Modifier
                 .padding(innerPadding)
                 .background(Color(0xFF1B1B1B))
@@ -40,7 +49,6 @@ fun SearchScreen(
 @Composable
 fun SearchScreenPreview() {
     val navController = rememberNavController()
-
     ANDANDROIDTheme {
         SearchScreen(
             navController = navController

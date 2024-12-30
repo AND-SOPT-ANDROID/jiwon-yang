@@ -36,11 +36,10 @@ import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
-fun SignUpScreen(
-    modifier: Modifier = Modifier,
+fun SignUpRoute(
     navigateToLoginScreen: () -> Unit,
     signUpViewModel: SignUpViewModel = hiltViewModel()
-) {
+){
     val uiState by signUpViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -60,6 +59,28 @@ fun SignUpScreen(
             }
         }
     }
+
+    SignUpScreen(
+        uiState = uiState,
+        onUserNameChanged = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnUserNameChanged(it)) },
+        onPasswordChanged = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnPasswordChanged(it)) },
+        onTogglePasswordVisibility = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnTogglePasswordVisibility) },
+        onHobbyChanged = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnHobbyChanged(it)) },
+        onSignUpButtonClicked = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnSignUpButtonClicked) }
+    )
+
+}
+
+@Composable
+fun SignUpScreen(
+    uiState: SignUpContract.SignUpUiState,
+    onUserNameChanged: (String) -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onHobbyChanged: (String) -> Unit,
+    onSignUpButtonClicked: () -> Unit,
+) {
+
 
     Column(
         modifier = Modifier
@@ -86,7 +107,7 @@ fun SignUpScreen(
 
         SignUpTextField(
             text = uiState.userName,
-            onValueChange = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnUserNameChanged(it)) },
+            onValueChange = onUserNameChanged,
             fieldType = "Username",
             conditionCheck = uiState.isUserNameValid,
             errMessage = "유저 이름은 7자 이하여야 합니다.",
@@ -97,20 +118,18 @@ fun SignUpScreen(
 
         SignUpTextField(
             text = uiState.password,
-            onValueChange = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnPasswordChanged(it)) },
+            onValueChange = onPasswordChanged,
             fieldType = "Password",
             conditionCheck = uiState.isPasswordValid,
             errMessage = "비밀번호는 8~20자 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.",
             placeholder = "비밀번호 입력",
             shouldShowPassword = uiState.shouldShowPassword,
-            onPasswordVisibilityChange = {
-                signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnTogglePasswordVisibility)
-            },
+            onPasswordVisibilityChange = onTogglePasswordVisibility,
             descriptionText = "비밀번호는 8~20자 이내로 영문, 숫자, 특수문자 중 3가지 이상 혼용해주세요."
         )
         SignUpTextField(
             text = uiState.hobby,
-            onValueChange = { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnHobbyChanged(it)) },
+            onValueChange = onHobbyChanged,
             fieldType = "Hobby",
             conditionCheck = uiState.isHobbyValid,
             errMessage = "취미는 7자 이하여야 합니다.",
@@ -118,7 +137,7 @@ fun SignUpScreen(
         )
 
         Spacer(modifier = Modifier.weight(0.5f))
-        SocialLoginSection(modifier = modifier)
+        SocialLoginSection(modifier = Modifier)
         Spacer(modifier = Modifier.weight(1f))
 
         Text(
@@ -127,17 +146,17 @@ fun SignUpScreen(
                 .fillMaxWidth()
                 .background(Color.DarkGray)
                 .padding(13.dp)
-                .clickable { signUpViewModel.setEvent(SignUpContract.SignUpEvent.OnSignUpButtonClicked) },
+                .clickable { onSignUpButtonClicked() },
             color = Color.White,
             textAlign = TextAlign.Center
         )
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SignUpScreenPreview() {
-    SignUpScreen(
-        navigateToLoginScreen = { }
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SignUpScreenPreview() {
+//    SignUpScreen(
+//        navigateToLoginScreen = { }
+//    )
+//}

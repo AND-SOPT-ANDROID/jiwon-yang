@@ -19,7 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import org.sopt.and.ui.components.SignUpandLogIn.SocialLoginSection
 
 @Composable
-fun CustomTopAppBarSecond(navController: NavController){
+fun CustomTopAppBarSecond(){
     TopAppBar(
         title = { },
         colors = topAppBarColors(
@@ -45,6 +45,5 @@ fun CustomTopAppBarSecond(navController: NavController){
 @Preview(showBackground = true)
 @Composable
 fun AppBarSecondPreview(){
-    val navController = rememberNavController()
-    CustomTopAppBarSecond(navController = navController)
+    CustomTopAppBarSecond()
 }

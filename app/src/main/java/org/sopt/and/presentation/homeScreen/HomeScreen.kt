@@ -1,6 +1,7 @@
 package org.sopt.and.presentation.homeScreen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
@@ -30,11 +31,10 @@ import org.sopt.and.ui.components.TopBar.CustomTopAppBar
 import org.sopt.and.ui.components.TopBar.CustomTopAppBarSecond
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
+fun HomeRoute(
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navController: NavController,
-    homeViewModel: HomeViewModel = hiltViewModel()
-) {
+){
     val scrollState = rememberScrollState()
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -53,13 +53,31 @@ fun HomeScreen(
         homeViewModel.setEvent(HomeContract.HomeEvent.OnScreenLoaded)
     }
 
+    HomeScreen(
+        scrollState = scrollState,
+        uiState = uiState,
+        navController = navController,
+        onItemClick = { index -> homeViewModel.setEvent(HomeContract.HomeEvent.OnImageClicked(index))}
+    )
+
+}
+
+@Composable
+fun HomeScreen(
+    scrollState: ScrollState,
+    uiState: HomeContract.HomeUiState,
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    onItemClick: (Int) -> Unit
+) {
+
     Scaffold(
         topBar = {
             Column(
                 modifier = modifier.fillMaxWidth()
             ) {
-                CustomTopAppBar(navController = navController)
-                CustomTopAppBarSecond(navController = navController)
+                CustomTopAppBar()
+                CustomTopAppBarSecond()
             }
         },
         bottomBar = { CustomBottomAppBar(navController = navController) }
@@ -98,9 +116,7 @@ fun HomeScreen(
                 images = uiState.pagerImages,
                 height = 230,
                 width = 140,
-                onItemClick = { index ->
-                    homeViewModel.setEvent(HomeContract.HomeEvent.OnImageClicked(index))
-                }
+                onItemClick = onItemClick
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -110,9 +126,7 @@ fun HomeScreen(
                 images = uiState.pagerImages,
                 height = 230,
                 width = 140,
-                onItemClick = { index ->
-                    homeViewModel.setEvent(HomeContract.HomeEvent.OnImageClicked(index))
-                }
+                onItemClick = onItemClick
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -122,9 +136,7 @@ fun HomeScreen(
                 images = uiState.pagerImages,
                 height = 230,
                 width = 140,
-                onItemClick = { index ->
-                    homeViewModel.setEvent(HomeContract.HomeEvent.OnImageClicked(index))
-                }
+                onItemClick = onItemClick
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -134,9 +146,7 @@ fun HomeScreen(
                 images = uiState.pagerImages,
                 height = 260,
                 width = 180,
-                onItemClick = { index ->
-                    homeViewModel.setEvent(HomeContract.HomeEvent.OnImageClicked(index))
-                }
+                onItemClick = onItemClick
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -146,9 +156,7 @@ fun HomeScreen(
                 images = uiState.pagerImages,
                 height = 230,
                 width = 140,
-                onItemClick = { index ->
-                    homeViewModel.setEvent(HomeContract.HomeEvent.OnImageClicked(index))
-                }
+                onItemClick = onItemClick
             )
         }
     }
@@ -157,29 +165,27 @@ fun HomeScreen(
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    val navController = rememberNavController()
-
-    val uiState = HomeContract.HomeUiState(
-        pagerImages = listOf(
-            R.drawable.food_pic1,
-            R.drawable.food_pic2,
-            R.drawable.food_pic3,
-            R.drawable.food_pic4,
-            R.drawable.food_pic5
-        )
-    )
-
-    val mockViewModel = object : HomeViewModel() {
-        init {
-            setState { uiState }
-        }
-    }
-
-    HomeScreen(
-        navController = navController,
-        homeViewModel = mockViewModel
-    )
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeScreenPreview() {
+//    val navController = rememberNavController()
+//
+//    val uiState = HomeContract.HomeUiState(
+//        pagerImages = listOf(
+//            R.drawable.food_pic1,
+//            R.drawable.food_pic2,
+//            R.drawable.food_pic3,
+//            R.drawable.food_pic4,
+//            R.drawable.food_pic5
+//        )
+//    )
+//
+//    val scrollState = rememberScrollState()
+//
+//    HomeScreen(
+//        scrollState = scrollState,
+//        uiState =  uiState,
+//        modifier = Modifier,
+//        onItemClick = { }
+//    )
+//}
